@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Navigate, Outlet, Route, Routes } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Sidebar } from "@/components/Sidebar";
+import { BienvenidaAlumno } from "@/pages/BienvenidaAlumno";
 import { ConfigurarEvaluacion } from "@/pages/ConfigurarEvaluacion";
 import { DashboardAlumno } from "@/pages/DashboardAlumno";
 import { DashboardDocente } from "@/pages/DashboardDocente";
@@ -45,6 +46,11 @@ export default function App() {
     <Routes>
       <Route path="/" element={<Navigate to="/login" replace />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/eval/:token" element={<BienvenidaAlumno />} />
+      <Route path="/eval" element={<Navigate to="/eval/demo-4b-matematica" replace />} />
+      <Route path="/fast-track/:token" element={<FastTrack />} />
+      <Route path="/evaluacion/:token" element={<EvaluacionFormal />} />
+      <Route path="/resultado/:token" element={<Resultado />} />
       <Route element={<AppLayout />}>
         <Route path="/dashboard" element={<DashboardDocente />} />
         <Route path="/nueva-evaluacion" element={<ConfigurarEvaluacion />} />
@@ -53,7 +59,7 @@ export default function App() {
         <Route path="/subir-alumnos" element={<SubirAlumnos />} />
         <Route path="/alumno" element={<DashboardAlumno />} />
         <Route path="/fast-track" element={<FastTrack />} />
-        <Route path="/evaluacion-formal" element={<EvaluacionFormal />} />
+        <Route path="/evaluacion-formal" element={<Navigate to="/evaluacion/demo-4b-matematica" replace />} />
         <Route path="/resultado" element={<Resultado />} />
       </Route>
       <Route path="*" element={<Navigate to="/login" replace />} />

@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { tokenDemo } from "@/lib/alumnoFlowMock";
 import { useAlumnoStore } from "@/store/alumnoStore";
 import { useEvaluacionStore } from "@/store/evaluacionStore";
 
@@ -24,7 +25,7 @@ export function DashboardAlumno() {
             Revisa tus evaluaciones disponibles, consulta devoluciones y prepara tu proxima entrega.
           </p>
           <Button asChild variant="secondary" className="mt-6">
-            <Link to="/evaluacion-formal">
+            <Link to={`/eval/${tokenDemo}`}>
               <PlayCircle className="h-4 w-4" />
               Comenzar evaluacion
             </Link>
