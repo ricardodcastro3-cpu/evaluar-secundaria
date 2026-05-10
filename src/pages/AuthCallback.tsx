@@ -1,24 +1,10 @@
 import { useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom"
-import { exchangeOAuthCodeIfPresent, isSupabaseConfigured, supabase } from "@/lib/supabase"
+import { resolvePostOAuthPath } from "@/lib/auth/postLoginNavigation"
 import { useAuthStore } from "@/store/authStore"
-import { peekOauthIntent } from "@/lib/oauthContext"
-import type { OauthIntent } from "@/lib/oauthContext"
 import { LoadingSpinner } from "@/components/LoadingSpinner"
 
-function destinationAfterCallback(intent: OauthIntent | null) {
-  const s = useAuthStore.getState()
-  if (intent === "alumno") {
-    return s.isDocente ? "/dashboard" : "/alumno"
-  }
-  const sol = s.docenteSolicitud
-  if (sol?.estado === "pendiente") return "/docente/pendiente"
-  if (sol?.estado === "rechazado") return "/docente/rechazado"
-  if (s.isDocente) return "/dashboard"
-  if (s.isAdmin) return "/admin/docentes"
-  return "/alumno"
-}
-
+/** Solo navega: PKCE + sesión ya resueltos en AuthProvider antes de montar esta ruta. */
 export function AuthCallback() {
   const navigate = useNavigate()
   const ran = useRef(false)
@@ -27,27 +13,17 @@ export function AuthCallback() {
     if (ran.current) return
     ran.current = true
 
-    void (async () => {
-      if (!isSupabaseConfigured() || !supabase) {
-        navigate("/login", { replace: true })
-        return
-      }
+    const { isAuthenticated, error } = useAuthStore.getState()
 
-      const intent = peekOauthIntent()
+    if (!isAuthenticated) {
+      const msg =
+        error ?? "No se pudo completar el inicio de sesión."
+      navigate(`/login?error=${encodeURIComponent(msg)}`, { replace: true })
+      return
+    }
 
-      await exchangeOAuthCodeIfPresent()
-      await useAuthStore.getState().checkSession()
-
-      const { isAuthenticated, error } = useAuthStore.getState()
-      if (!isAuthenticated) {
-        const msg = error ?? "No se pudo completar el inicio de sesión."
-        const base = intent === "alumno" ? "/alumno/login" : "/login"
-        navigate(`${base}?error=${encodeURIComponent(msg)}`, { replace: true })
-        return
-      }
-
-      navigate(destinationAfterCallback(intent), { replace: true })
-    })()
+    const dest = resolvePostOAuthPath(useAuthStore.getState())
+    navigate(dest, { replace: true })
   }, [navigate])
 
   return (
