@@ -15,6 +15,7 @@ import {
   Link2,
   Copy,
   CheckCircle2,
+  Zap,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -78,6 +79,7 @@ export function ConfigurarEvaluacion() {
   const [generando, setGenerando] = useState(false)
   const [generado, setGenerado] = useState(false)
   const [linkCopiado, setLinkCopiado] = useState(false)
+  const [mensajeCopiado, setMensajeCopiado] = useState(false)
   const [tokenGenerado] = useState(() => `eval-${Date.now().toString(36)}`)
 
   const linkAlumnos = `${window.location.origin}/eval/${tokenGenerado}`
@@ -134,6 +136,24 @@ export function ConfigurarEvaluacion() {
     navigator.clipboard.writeText(linkAlumnos)
     setLinkCopiado(true)
     setTimeout(() => setLinkCopiado(false), 2000)
+  }
+
+  const mensajeClassroom = `📝 ${nombre || "Evaluación"} — ${materia || "Materia"} ${curso} ${division}
+
+Ingresá al siguiente link para practicar con el Fast Track antes de rendir la evaluación formal.
+
+🔗 ${linkAlumnos}
+
+⚡ Podés practicar con el Fast Track las veces que quieras antes de iniciar la evaluación.
+⚠️ La evaluación formal tiene una sola oportunidad y no se puede pausar ni reiniciar.
+
+📅 Fecha: ${fecha || "A confirmar"}
+⏱️ Duración: ${duracion} minutos`
+
+  const handleCopiarMensajeClassroom = () => {
+    navigator.clipboard.writeText(mensajeClassroom)
+    setMensajeCopiado(true)
+    setTimeout(() => setMensajeCopiado(false), 3000)
   }
 
   const getFileIcon = (tipo: string) => {
@@ -455,6 +475,7 @@ export function ConfigurarEvaluacion() {
                 </CardContent>
               </Card>
 
+              {/* Link directo */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -462,11 +483,11 @@ export function ConfigurarEvaluacion() {
                     Link de acceso para alumnos
                   </CardTitle>
                   <CardDescription>
-                    Compartí este link con tus alumnos. Al acceder, se registrarán automáticamente
-                    y el listado se generará en orden alfabético.
+                    Compartí este link con tus alumnos. Al acceder se registran automáticamente
+                    y pueden practicar con el Fast Track antes de rendir.
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-3">
                   <div className="flex items-center gap-2">
                     <Input
                       readOnly
@@ -491,23 +512,76 @@ export function ConfigurarEvaluacion() {
                       ¡Link copiado al portapapeles!
                     </p>
                   )}
-                  <div className="rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 p-3">
-                    <p className="text-sm text-blue-800 dark:text-blue-200">
-                      <strong>¿Cómo funciona?</strong> Los alumnos acceden al link, se loguean con su cuenta,
-                      y automáticamente quedan registrados en la evaluación. El listado se ordena alfabéticamente.
-                      Cada alumno recibe una evaluación diferente generada por IA.
-                    </p>
-                  </div>
                 </CardContent>
               </Card>
+
+              {/* Mensaje listo para Classroom */}
+              <Card className="border-2 border-blue-200 dark:border-blue-800">
+                <CardHeader>
+                  <div className="flex items-center gap-3">
+                    <div className="rounded-lg bg-blue-100 dark:bg-blue-900/50 p-2">
+                      <svg viewBox="0 0 24 24" className="h-6 w-6 text-blue-600 dark:text-blue-400" fill="currentColor">
+                        <path d="M1.637 1.637C.732 1.637 0 2.369 0 3.273v17.454c0 .904.732 1.636 1.637 1.636h20.726c.905 0 1.637-.732 1.637-1.636V3.273c0-.904-.732-1.636-1.637-1.636H1.637zM12 11.182a2.182 2.182 0 100-4.364 2.182 2.182 0 000 4.364zm-4.364 4.909c0-1.636 2.91-2.727 4.364-2.727s4.364 1.09 4.364 2.727v.545H7.636v-.545z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <CardTitle className="text-base">Publicar en Google Classroom</CardTitle>
+                      <CardDescription>
+                        Copiá este mensaje y pegalo en el Tablón de Classroom
+                      </CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="rounded-lg bg-slate-50 dark:bg-slate-900/50 border p-4">
+                    <pre className="text-sm whitespace-pre-wrap font-sans text-foreground leading-relaxed">
+                      {mensajeClassroom}
+                    </pre>
+                  </div>
+                  <Button
+                    onClick={handleCopiarMensajeClassroom}
+                    size="lg"
+                    className="w-full gap-2"
+                    variant={mensajeCopiado ? "outline" : "default"}
+                  >
+                    {mensajeCopiado ? (
+                      <>
+                        <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+                        <span className="text-emerald-600 font-semibold">¡Mensaje copiado! Pegalo en Classroom</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="h-5 w-5" />
+                        Copiar mensaje para Classroom
+                      </>
+                    )}
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Info */}
+              <div className="rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 p-4">
+                <div className="flex items-start gap-3">
+                  <Zap className="h-5 w-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                  <div className="text-sm text-emerald-800 dark:text-emerald-200 space-y-1">
+                    <p className="font-semibold">¿Qué van a ver los alumnos?</p>
+                    <ul className="list-disc list-inside space-y-0.5 text-emerald-700 dark:text-emerald-300">
+                      <li>Pantalla de bienvenida con los datos de la evaluación</li>
+                      <li>Pueden practicar con el <strong>Fast Track</strong> las veces que quieran</li>
+                      <li>Cuando estén listos, inician la <strong>evaluación formal</strong> (una sola oportunidad)</li>
+                      <li>Al finalizar reciben el resultado completo con rúbrica</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
 
               <div className="flex gap-3">
                 <Button variant="outline" onClick={() => navigate("/dashboard")}>
                   Volver al Dashboard
                 </Button>
-                <Button className="gap-2">
+                <Button className="gap-2" onClick={() => window.open(linkAlumnos, "_blank")}>
                   <Eye className="h-4 w-4" />
-                  Ver Evaluación
+                  Ver como alumno
                 </Button>
               </div>
             </div>

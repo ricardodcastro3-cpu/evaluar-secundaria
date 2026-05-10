@@ -98,58 +98,68 @@ export function BienvenidaAlumno() {
 
             <Separator />
 
-            <div className="space-y-4">
-              <p className="text-center text-sm text-muted-foreground">
-                Elegí cómo querés comenzar
+            {/* Fast Track — acción principal */}
+            <div className="space-y-3">
+              <p className="text-center text-sm font-semibold text-emerald-700 dark:text-emerald-300">
+                ⚡ Empezá practicando con el Fast Track
               </p>
+              <button
+                onClick={() => navigate(`/fast-track/${token}`)}
+                className="w-full group relative flex items-center gap-4 rounded-xl border-2 border-emerald-300 bg-emerald-50 p-5 transition-all hover:border-emerald-400 hover:shadow-lg hover:shadow-emerald-100 hover:scale-[1.01] active:scale-[0.99] dark:border-emerald-700 dark:bg-emerald-950/30 dark:hover:border-emerald-500 dark:hover:shadow-emerald-900/20"
+              >
+                <div className="rounded-xl bg-emerald-100 p-3 dark:bg-emerald-900/50">
+                  <Zap className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
+                </div>
+                <div className="text-left flex-1">
+                  <p className="font-bold text-lg text-emerald-700 dark:text-emerald-300">
+                    Practicar con Fast Track
+                  </p>
+                  <p className="text-sm text-emerald-600/80 dark:text-emerald-400/80 mt-0.5">
+                    {ev.duracionFastTrack} min · 10 ítems de práctica · Podés repetirlo las veces que quieras
+                  </p>
+                </div>
+                <div className="text-emerald-500 dark:text-emerald-400 group-hover:translate-x-1 transition-transform">
+                  →
+                </div>
+              </button>
+            </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <button
-                  onClick={() => navigate(`/fast-track/${token}`)}
-                  className="group relative flex flex-col items-center gap-3 rounded-xl border-2 border-emerald-200 bg-emerald-50 p-6 transition-all hover:border-emerald-400 hover:shadow-lg hover:shadow-emerald-100 hover:scale-[1.02] active:scale-[0.98] dark:border-emerald-800 dark:bg-emerald-950/30 dark:hover:border-emerald-600 dark:hover:shadow-emerald-900/20"
-                >
-                  <div className="rounded-xl bg-emerald-100 p-3 dark:bg-emerald-900/50">
-                    <Zap className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
-                  </div>
-                  <div className="text-center">
-                    <p className="font-bold text-emerald-700 dark:text-emerald-300">
-                      Practicar con Fast Track
-                    </p>
-                    <p className="text-xs text-emerald-600/70 dark:text-emerald-400/70 mt-1">
-                      {ev.duracionFastTrack} min · Podés repetirlo
-                    </p>
-                  </div>
-                </button>
+            <Separator />
 
-                <button
-                  onClick={() => navigate(`/evaluacion/${token}`)}
-                  className="group relative flex flex-col items-center gap-3 rounded-xl border-2 border-blue-200 bg-blue-50 p-6 transition-all hover:border-blue-400 hover:shadow-lg hover:shadow-blue-100 hover:scale-[1.02] active:scale-[0.98] dark:border-blue-800 dark:bg-blue-950/30 dark:hover:border-blue-600 dark:hover:shadow-blue-900/20"
-                >
-                  <div className="rounded-xl bg-blue-100 p-3 dark:bg-blue-900/50">
-                    <BookOpen className="h-8 w-8 text-blue-600 dark:text-blue-400" />
-                  </div>
-                  <div className="text-center">
-                    <p className="font-bold text-blue-700 dark:text-blue-300">
-                      Iniciar Evaluación Formal
-                    </p>
-                    <p className="text-xs text-blue-600/70 dark:text-blue-400/70 mt-1">
-                      {ev.duracionFormal} min · Una sola oportunidad
-                    </p>
-                  </div>
-                </button>
-              </div>
+            {/* Evaluación Formal — acción secundaria */}
+            <div className="space-y-3">
+              <p className="text-center text-xs text-muted-foreground">
+                Cuando te sientas preparado/a
+              </p>
+              <button
+                onClick={() => navigate(`/evaluacion/${token}`)}
+                className="w-full group relative flex items-center gap-4 rounded-xl border-2 border-blue-200 bg-blue-50/50 p-4 transition-all hover:border-blue-400 hover:shadow-md hover:scale-[1.01] active:scale-[0.99] dark:border-blue-800 dark:bg-blue-950/20 dark:hover:border-blue-600"
+              >
+                <div className="rounded-xl bg-blue-100 p-2.5 dark:bg-blue-900/50">
+                  <BookOpen className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                </div>
+                <div className="text-left flex-1">
+                  <p className="font-semibold text-blue-700 dark:text-blue-300">
+                    Iniciar Evaluación Formal
+                  </p>
+                  <p className="text-xs text-blue-600/70 dark:text-blue-400/70 mt-0.5">
+                    {ev.duracionFormal} min · Una sola oportunidad
+                  </p>
+                </div>
+              </button>
             </div>
 
             <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-950/30">
               <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
-              <div>
-                <p className="font-semibold text-sm text-amber-800 dark:text-amber-200">
+              <div className="text-sm text-amber-700 dark:text-amber-300 space-y-1">
+                <p className="font-semibold text-amber-800 dark:text-amber-200">
                   Importante
                 </p>
-                <p className="text-sm text-amber-700 dark:text-amber-300 mt-0.5">
-                  La evaluación formal tiene una sola oportunidad. No podrás repetirla.
-                  Te recomendamos practicar primero con el Fast Track.
-                </p>
+                <ul className="list-disc list-inside space-y-0.5">
+                  <li>La evaluación formal tiene <strong>una sola oportunidad</strong>. No podrás repetirla.</li>
+                  <li>Al iniciar la evaluación formal, se borran los resultados del Fast Track.</li>
+                  <li>Te recomendamos practicar primero con el Fast Track las veces que necesites.</li>
+                </ul>
               </div>
             </div>
           </CardContent>
