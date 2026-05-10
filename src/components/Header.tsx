@@ -13,17 +13,20 @@ const mobileLinks = [
 
 export function Header() {
   const navigate = useNavigate();
-  const { usuario, tema, toggleTema, logout } = useAuthStore();
+  const { user, isDocente, tema, toggleTema, signOut } = useAuthStore();
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await signOut();
     navigate("/login");
   };
+
+  const nombreUsuario =
+    user?.user_metadata?.full_name ?? user?.user_metadata?.name ?? user?.email ?? "Usuario";
 
   return (
     <header className="sticky top-0 z-30 border-b bg-background/85 backdrop-blur-xl">
       <div className="flex min-h-16 items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
-        <Link to={usuario?.rol === "alumno" ? "/alumno" : "/dashboard"} className="flex items-center gap-3">
+        <Link to={isDocente ? "/dashboard" : "/eval/demo-4b-matematica"} className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary text-sm font-bold text-primary-foreground lg:hidden">
             EA
           </div>
@@ -64,11 +67,13 @@ export function Header() {
           >
             {tema === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </Button>
-          {usuario ? (
+          {user ? (
             <>
               <div className="hidden text-right sm:block">
-                <p className="text-sm font-semibold">{usuario.nombre}</p>
-                <p className="text-xs capitalize text-muted-foreground">{usuario.rol}</p>
+                <p className="text-sm font-semibold">{nombreUsuario}</p>
+                <p className="text-xs capitalize text-muted-foreground">
+                  {isDocente ? "docente" : "alumno"}
+                </p>
               </div>
               <Button variant="ghost" size="icon" onClick={handleLogout} aria-label="Cerrar sesion">
                 <LogOut className="h-4 w-4" />

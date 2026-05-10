@@ -1,11 +1,11 @@
-export const supabaseConfig = {
-  url: import.meta.env.VITE_SUPABASE_URL ?? "",
-  anonKey: import.meta.env.VITE_SUPABASE_ANON_KEY ?? "",
-};
+import { createClient } from "@supabase/supabase-js";
 
-export function getSupabaseStatus() {
-  return {
-    configured: Boolean(supabaseConfig.url && supabaseConfig.anonKey),
-    message: "Supabase aun no esta conectado. Este modulo queda listo para integrar.",
-  };
-}
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+const supabase = createClient(
+  supabaseUrl || "https://placeholder.supabase.co",
+  supabaseAnonKey || "placeholder-anon-key",
+);
+
+export default supabase;

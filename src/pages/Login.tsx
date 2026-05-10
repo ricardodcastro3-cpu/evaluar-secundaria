@@ -1,7 +1,9 @@
-import { BookOpenCheck, CheckCircle2, GraduationCap, ShieldCheck } from "lucide-react";
+import { BookOpenCheck, CheckCircle2, GraduationCap, Loader2, ShieldCheck } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { tokenDemo } from "@/lib/alumnoFlowMock";
 import { useAuthStore } from "@/store/authStore";
 
 const beneficios = [
@@ -12,11 +14,29 @@ const beneficios = [
 
 export function Login() {
   const navigate = useNavigate();
-  const loginDemo = useAuthStore((state) => state.loginDemo);
+  const { user, loading, isDocente, signInWithGoogle, checkSession } = useAuthStore();
+  const [error, setError] = useState<string | null>(null);
 
-  const ingresarConGoogle = () => {
-    loginDemo("docente");
-    navigate("/dashboard");
+  useEffect(() => {
+    void checkSession();
+  }, [checkSession]);
+
+  useEffect(() => {
+    if (!user || loading) {
+      return;
+    }
+
+    navigate(isDocente ? "/dashboard" : `/eval/${tokenDemo}`, { replace: true });
+  }, [isDocente, loading, navigate, user]);
+
+  const ingresarConGoogle = async () => {
+    setError(null);
+
+    try {
+      await signInWithGoogle();
+    } catch {
+      setError("No se pudo iniciar sesion con Google. Revisa la configuracion de Supabase.");
+    }
   };
 
   return (
@@ -39,12 +59,27 @@ export function Login() {
             revisen resultados con datos de ejemplo.
           </p>
 
-          <Button onClick={ingresarConGoogle} size="lg" className="mt-8 h-14 w-full text-base">
-            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-lg font-black text-slate-900">
-              G
-            </span>
-            Ingresar con Google
+          <Button
+            onClick={ingresarConGoogle}
+            disabled={loading}
+            size="lg"
+            className="mt-8 h-14 w-full text-base"
+          >
+            {loading ? (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            ) : (
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-lg font-black text-slate-900">
+                G
+              </span>
+            )}
+            {loading ? "Conectando..." : "Ingresar con Google"}
           </Button>
+
+          {error ? (
+            <p className="mt-4 rounded-2xl border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-200">
+              {error}
+            </p>
+          ) : null}
 
           <div className="mt-8 grid gap-3 text-left">
             {beneficios.map((beneficio) => (
@@ -58,13 +93,13 @@ export function Login() {
           <div className="mt-8 grid gap-3 sm:grid-cols-2">
             <div className="rounded-2xl bg-secondary p-4">
               <ShieldCheck className="mx-auto mb-2 h-5 w-5 text-primary" />
-              <p className="text-sm font-semibold">Demo segura</p>
-              <p className="mt-1 text-xs text-muted-foreground">Sin conexion a backend</p>
+              <p className="text-sm font-semibold">OAuth seguro</p>
+              <p className="mt-1 text-xs text-muted-foreground">Con Supabase Auth</p>
             </div>
             <div className="rounded-2xl bg-secondary p-4">
               <GraduationCap className="mx-auto mb-2 h-5 w-5 text-primary" />
-              <p className="text-sm font-semibold">Docente mock</p>
-              <p className="mt-1 text-xs text-muted-foreground">Ingreso instantaneo</p>
+              <p className="text-sm font-semibold">Redireccion por rol</p>
+              <p className="mt-1 text-xs text-muted-foreground">Docente o alumno</p>
             </div>
           </div>
         </CardContent>
