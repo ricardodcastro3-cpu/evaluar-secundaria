@@ -39,13 +39,17 @@ import { cn } from "@/lib/utils"
 
 const materias = [
   "Matemática", "Lengua y Literatura", "Historia", "Geografía",
-  "Biología", "Física", "Química", "Inglés", "Educación Cívica",
+  "Biología", "Física", "Química", "Inglés", "Formación Ética y Ciudadana",
   "Informática I", "Informática II", "Informática III",
   "Tecnología I", "Tecnología II", "Tecnología III",
 ]
 const cursos = ["1°", "2°", "3°", "4°", "5°", "6°"]
-const divisiones = ["A", "B", "C", "D"]
-const turnos = ["Mañana", "Tarde", "Noche"]
+const divisiones = [
+  "A", "B", "C", "D",
+  "PRIMERA", "SEGUNDA", "TERCERA", "CUARTA", "QUINTA",
+  "SEXTA", "SÉPTIMA", "OCTAVA", "NOVENA",
+]
+const turnos = ["Mañana", "Tarde", "Intermedio", "Noche"]
 
 interface ArchivoSubido {
   nombre: string
