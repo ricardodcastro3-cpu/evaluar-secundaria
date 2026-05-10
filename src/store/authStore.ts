@@ -127,7 +127,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       return
     }
     await oauthGoogle(
-      "/login",
+      "/auth/callback",
       (v) => set({ loading: v }),
       (e) => set({ error: e, loading: false }),
     )
@@ -150,7 +150,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       return
     }
     await oauthGoogle(
-      "/alumno/login",
+      "/auth/callback",
       (v) => set({ loading: v }),
       (e) => set({ error: e, loading: false }),
     )

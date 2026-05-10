@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { Layout } from "@/components/Layout"
 import { Login } from "@/pages/Login"
+import { AuthCallback } from "@/pages/AuthCallback"
 import { AlumnoLogin } from "@/pages/AlumnoLogin"
 import { PendingDocente } from "@/pages/PendingDocente"
 import { RejectedDocente } from "@/pages/RejectedDocente"
@@ -62,6 +63,7 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
+      <Route path="/auth/callback" element={<AuthCallback />} />
       <Route path="/alumno/login" element={<AlumnoLogin />} />
       <Route path="/docente/pendiente" element={<PendingDocente />} />
       <Route path="/docente/rechazado" element={<RejectedDocente />} />

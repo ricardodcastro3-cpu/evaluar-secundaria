@@ -7,7 +7,11 @@ import { useAuthStore } from "@/store/authStore"
 
 async function bootstrapAuth() {
   await exchangeOAuthCodeIfPresent()
-  await useAuthStore.getState().checkSession()
+  const onAuthCallback =
+    typeof window !== "undefined" && window.location.pathname === "/auth/callback"
+  if (!onAuthCallback) {
+    await useAuthStore.getState().checkSession()
+  }
 
   if (isSupabaseConfigured() && supabase) {
     supabase.auth.onAuthStateChange((event) => {
