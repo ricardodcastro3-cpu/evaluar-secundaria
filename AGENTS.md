@@ -2,24 +2,26 @@
 
 ## Instrucciones específicas para Cursor Cloud
 
-Este repositorio (`evaluar-secundaria`) es actualmente un proyecto vacío — solo contiene un `README.md` como marcador de posición. No hay código de aplicación, dependencias, sistema de compilación ni servicios para ejecutar.
+Este repositorio es **EvalAr Secundaria**, un sistema de evaluaciones para docentes de secundaria argentina, construido con React + Vite + TypeScript + Tailwind CSS + shadcn/ui + Zustand + React Router v6.
 
-**Idioma del proyecto:** Español. Toda la documentación y comentarios deben estar en español.
+**Idioma del proyecto:** Español. Toda la documentación, comentarios y texto de la UI deben estar en español.
 
-### Estado actual (al momento de la configuración inicial)
+### Comandos principales
 
-- **Lenguaje/framework:** Aún no elegido
-- **Gestor de paquetes:** Ninguno
-- **Sistema de compilación:** Ninguno
-- **Servicios:** Ninguno
-- **Base de datos:** Ninguna
-- **Tests:** Ninguno
-- **Linter:** Ninguno
+- `npm install` — instalar dependencias
+- `npm run dev` — servidor de desarrollo (Vite, puerto 5173)
+- `npm run build` — build de producción (requiere `tsc -b` sin errores)
+- `npm run lint` — ejecutar ESLint
 
-### Para futuros agentes
+### Cuentas de prueba (mock, sin Supabase)
 
-Una vez que el proyecto tenga código y dependencias reales, esta sección debe actualizarse con:
-- Cómo instalar dependencias (script de actualización)
-- Cómo ejecutar el servidor de desarrollo
-- Cómo ejecutar tests y linting
-- Cualquier problema no obvio descubierto durante el desarrollo
+- **Docente:** `docente@evaluar.edu.ar` / `123456`
+- **Alumno:** `alumno@evaluar.edu.ar` / `123456`
+
+### Notas para futuros agentes
+
+- El proyecto actualmente usa datos mock en los stores de Zustand. Supabase, Gemini y Resend tienen placeholders en `src/lib/` pero no están conectados.
+- Las variables de entorno están definidas en `.env.example`. No son necesarias para el funcionamiento con datos mock.
+- shadcn/ui está configurado con Tailwind CSS v4 y el Vite plugin. Para agregar nuevos componentes: `npx shadcn@latest add <componente>`.
+- El color principal es índigo (#4F46E5). El tema soporta modo oscuro/claro con toggle.
+- La fuente del proyecto es Inter (cargada vía Google Fonts en `index.html`).
