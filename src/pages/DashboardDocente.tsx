@@ -16,7 +16,9 @@ import {
   CalendarDays,
   Search,
   Filter,
+  Download,
 } from "lucide-react"
+import * as XLSX from "xlsx"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -146,19 +148,20 @@ interface AlumnoRow {
   intentosFastTrack: number
   nota: number | null
   tiempo: string | null
+  puntaje: number
 }
 
 const alumnosMock: AlumnoRow[] = [
-  { id: "1", nombre: "Juan", apellido: "Pérez", estado: "completado", intentosFastTrack: 3, nota: 8, tiempo: "45:20" },
-  { id: "2", nombre: "María", apellido: "López", estado: "completado", intentosFastTrack: 1, nota: 9, tiempo: "38:15" },
-  { id: "3", nombre: "Carlos", apellido: "García", estado: "en_curso", intentosFastTrack: 2, nota: null, tiempo: null },
-  { id: "4", nombre: "Lucía", apellido: "Martínez", estado: "completado", intentosFastTrack: 1, nota: 7, tiempo: "52:40" },
-  { id: "5", nombre: "Tomás", apellido: "Rodríguez", estado: "pendiente", intentosFastTrack: 0, nota: null, tiempo: null },
-  { id: "6", nombre: "Valentina", apellido: "Fernández", estado: "completado", intentosFastTrack: 2, nota: 5, tiempo: "60:00" },
-  { id: "7", nombre: "Mateo", apellido: "Gómez", estado: "no_iniciado", intentosFastTrack: 0, nota: null, tiempo: null },
-  { id: "8", nombre: "Sofía", apellido: "Díaz", estado: "completado", intentosFastTrack: 1, nota: 10, tiempo: "32:10" },
-  { id: "9", nombre: "Benjamín", apellido: "Ruiz", estado: "completado", intentosFastTrack: 4, nota: 4, tiempo: "59:50" },
-  { id: "10", nombre: "Camila", apellido: "Torres", estado: "pendiente", intentosFastTrack: 0, nota: null, tiempo: null },
+  { id: "1", nombre: "Juan", apellido: "Pérez", estado: "completado", intentosFastTrack: 3, nota: 8, tiempo: "45:20", puntaje: 78 },
+  { id: "2", nombre: "María", apellido: "López", estado: "completado", intentosFastTrack: 1, nota: 9, tiempo: "38:15", puntaje: 88 },
+  { id: "3", nombre: "Carlos", apellido: "García", estado: "en_curso", intentosFastTrack: 2, nota: null, tiempo: null, puntaje: 55 },
+  { id: "4", nombre: "Lucía", apellido: "Martínez", estado: "completado", intentosFastTrack: 1, nota: 7, tiempo: "52:40", puntaje: 72 },
+  { id: "5", nombre: "Tomás", apellido: "Rodríguez", estado: "pendiente", intentosFastTrack: 0, nota: null, tiempo: null, puntaje: 63 },
+  { id: "6", nombre: "Valentina", apellido: "Fernández", estado: "completado", intentosFastTrack: 2, nota: 5, tiempo: "60:00", puntaje: 48 },
+  { id: "7", nombre: "Mateo", apellido: "Gómez", estado: "no_iniciado", intentosFastTrack: 0, nota: null, tiempo: null, puntaje: 42 },
+  { id: "8", nombre: "Sofía", apellido: "Díaz", estado: "completado", intentosFastTrack: 1, nota: 10, tiempo: "32:10", puntaje: 95 },
+  { id: "9", nombre: "Benjamín", apellido: "Ruiz", estado: "completado", intentosFastTrack: 4, nota: 4, tiempo: "59:50", puntaje: 35 },
+  { id: "10", nombre: "Camila", apellido: "Torres", estado: "pendiente", intentosFastTrack: 0, nota: null, tiempo: null, puntaje: 58 },
 ]
 
 const estadoConfig: Record<string, { label: string; color: string; bg: string }> = {
@@ -173,6 +176,152 @@ const estadoAlumnoConfig: Record<string, { label: string; variant: "default" | "
   en_curso: { label: "En curso", variant: "secondary" },
   pendiente: { label: "Pendiente", variant: "outline" },
   no_iniciado: { label: "No iniciado", variant: "destructive" },
+}
+
+const reporteEval = evaluacionesMock[0]
+
+const alumnosReporte = [...alumnosMock]
+  .sort((a, b) => {
+    const nameA = `${a.apellido}, ${a.nombre}`
+    const nameB = `${b.apellido}, ${b.nombre}`
+    return nameA.localeCompare(nameB, "es")
+  })
+  .map((a, i) => ({
+    orden: i + 1,
+    nombreCompleto: `${a.apellido}, ${a.nombre}`,
+    puntaje: a.puntaje,
+    resultado: a.puntaje >= 60 ? "APROBADO" : "REPROBADO",
+  }))
+
+function descargarExcel() {
+  const wb = XLSX.utils.book_new()
+
+  const headerRows = [
+    ["ESCUELA:", "E.E.S. N° 1 - San Martín"],
+    ["Evaluación de:", `${reporteEval.titulo}`],
+    ["MATERIA:", reporteEval.materia],
+    ["CURSO:", reporteEval.curso],
+    ["DIVISIÓN:", reporteEval.division],
+    ["FECHA:", reporteEval.fecha],
+    [],
+    ["N° DE ORDEN", "APELLIDO Y NOMBRE", "PUNTAJE OBTENIDO", "APROBADO / REPROBADO"],
+  ]
+
+  const dataRows = alumnosReporte.map((a) => [
+    a.orden,
+    a.nombreCompleto,
+    a.puntaje,
+    a.resultado,
+  ])
+
+  const wsData = [...headerRows, ...dataRows]
+  const ws = XLSX.utils.aoa_to_sheet(wsData)
+
+  ws["!cols"] = [
+    { wch: 14 },
+    { wch: 30 },
+    { wch: 20 },
+    { wch: 24 },
+  ]
+
+  XLSX.utils.book_append_sheet(wb, ws, "Reporte Final")
+  XLSX.writeFile(wb, "reporte_final_evaluacion.xlsx")
+}
+
+function ReportesTab() {
+  const totalAprobados = alumnosReporte.filter((a) => a.resultado === "APROBADO").length
+  const totalReprobados = alumnosReporte.length - totalAprobados
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <BarChart3 className="h-5 w-5" />
+            Reporte Final de la Evaluación del Curso
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 text-sm">
+            <div>
+              <span className="text-muted-foreground">Evaluación:</span>{" "}
+              <span className="font-medium">{reporteEval.titulo}</span>
+            </div>
+            <div>
+              <span className="text-muted-foreground">Materia:</span>{" "}
+              <span className="font-medium">{reporteEval.materia}</span>
+            </div>
+            <div>
+              <span className="text-muted-foreground">Curso:</span>{" "}
+              <span className="font-medium">{reporteEval.curso}</span>
+            </div>
+            <div>
+              <span className="text-muted-foreground">División:</span>{" "}
+              <span className="font-medium">{reporteEval.division}</span>
+            </div>
+            <div>
+              <span className="text-muted-foreground">Fecha:</span>{" "}
+              <span className="font-medium">{reporteEval.fecha}</span>
+            </div>
+            <div>
+              <span className="text-muted-foreground">Escuela:</span>{" "}
+              <span className="font-medium">E.E.S. N° 1 - San Martín</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-4 pt-2 border-t text-sm">
+            <Badge variant="default" className="bg-emerald-600">
+              {totalAprobados} aprobados
+            </Badge>
+            <Badge variant="destructive">
+              {totalReprobados} reprobados
+            </Badge>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <CardTitle className="text-lg">Vista previa del reporte</CardTitle>
+            <Button onClick={descargarExcel} className="gap-2">
+              <Download className="h-4 w-4" />
+              Descargar Excel
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="rounded-lg border overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b bg-muted/50">
+                    <th className="text-center font-medium text-muted-foreground px-4 py-3 w-20">N° DE ORDEN</th>
+                    <th className="text-left font-medium text-muted-foreground px-4 py-3">APELLIDO Y NOMBRE</th>
+                    <th className="text-center font-medium text-muted-foreground px-4 py-3">PUNTAJE OBTENIDO</th>
+                    <th className="text-center font-medium text-muted-foreground px-4 py-3">APROBADO / REPROBADO</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {alumnosReporte.map((a) => (
+                    <tr key={a.orden} className="border-b last:border-0 hover:bg-accent/50 transition-colors">
+                      <td className="px-4 py-3 text-center font-mono">{a.orden}</td>
+                      <td className="px-4 py-3 font-medium">{a.nombreCompleto}</td>
+                      <td className="px-4 py-3 text-center font-mono">{a.puntaje}</td>
+                      <td className="px-4 py-3 text-center">
+                        <Badge variant={a.resultado === "APROBADO" ? "default" : "destructive"}>
+                          {a.resultado}
+                        </Badge>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  )
 }
 
 export function DashboardDocente() {
@@ -428,18 +577,7 @@ export function DashboardDocente() {
 
         {/* Reportes */}
         <TabsContent value="reportes" className="mt-0">
-          <Card>
-            <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-              <div className="rounded-2xl bg-muted/50 p-6 mb-4">
-                <BarChart3 className="h-12 w-12 text-muted-foreground/50" />
-              </div>
-              <h3 className="text-lg font-semibold">Reportes</h3>
-              <p className="text-muted-foreground mt-1 max-w-sm">
-                Los reportes estadísticos estarán disponibles próximamente. Podrás ver gráficos de rendimiento, comparativas por curso y exportar a PDF.
-              </p>
-              <Badge variant="secondary" className="mt-4">Próximamente</Badge>
-            </CardContent>
-          </Card>
+          <ReportesTab />
         </TabsContent>
       </Tabs>
     </div>
