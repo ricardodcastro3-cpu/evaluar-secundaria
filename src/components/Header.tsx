@@ -18,16 +18,16 @@ interface HeaderProps {
 
 export function Header({ onToggleSidebar }: HeaderProps) {
   const { theme, toggleTheme } = useTheme()
-  const { usuario, logout } = useAuthStore()
+  const { user, signOut } = useAuthStore()
   const navigate = useNavigate()
 
-  const handleLogout = () => {
-    logout()
+  const handleLogout = async () => {
+    await signOut()
     navigate("/login")
   }
 
-  const initials = usuario
-    ? `${usuario.nombre[0]}${usuario.apellido[0]}`
+  const initials = user
+    ? `${user.nombre[0] || ""}${user.apellido[0] || ""}`.toUpperCase() || "?"
     : "?"
 
   return (
@@ -73,7 +73,7 @@ export function Header({ onToggleSidebar }: HeaderProps) {
           )}
         </Button>
 
-        {usuario && (
+        {user && (
           <DropdownMenu>
             <DropdownMenuTrigger
               className="relative flex h-9 w-9 items-center justify-center rounded-full hover:bg-accent transition-colors"
@@ -93,10 +93,10 @@ export function Header({ onToggleSidebar }: HeaderProps) {
                 </Avatar>
                 <div className="flex flex-col">
                   <p className="text-sm font-medium">
-                    {usuario.nombre} {usuario.apellido}
+                    {user.nombre} {user.apellido}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    {usuario.email}
+                    {user.email}
                   </p>
                 </div>
               </div>

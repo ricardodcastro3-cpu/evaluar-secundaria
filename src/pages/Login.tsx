@@ -1,3 +1,4 @@
+import { useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { GraduationCap, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -30,14 +31,25 @@ function GoogleIcon({ className }: { className?: string }) {
 
 export function Login() {
   const navigate = useNavigate()
-  const { login, isLoading } = useAuthStore()
+  const { signInWithGoogle, checkSession, isAuthenticated, isDocente, loading, error } =
+    useAuthStore()
   const { theme, toggleTheme } = useTheme()
 
+  useEffect(() => {
+    checkSession()
+  }, [checkSession])
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate(isDocente ? "/dashboard" : "/alumno", { replace: true })
+    }
+  }, [isAuthenticated, isDocente, navigate])
+
   const handleGoogleLogin = async () => {
-    await login("docente@evaluar.edu.ar", "123456")
+    await signInWithGoogle()
     const state = useAuthStore.getState()
     if (state.isAuthenticated) {
-      navigate(state.usuario?.rol === "docente" ? "/dashboard" : "/alumno")
+      navigate(state.isDocente ? "/dashboard" : "/alumno", { replace: true })
     }
   }
 
@@ -90,12 +102,18 @@ export function Login() {
               </p>
             </div>
 
+            {error && (
+              <div className="rounded-lg bg-red-500/20 border border-red-400/30 p-3 text-center">
+                <p className="text-sm text-red-100">{error}</p>
+              </div>
+            )}
+
             <Button
               onClick={handleGoogleLogin}
-              disabled={isLoading}
+              disabled={loading}
               className="w-full h-14 bg-white hover:bg-gray-50 text-gray-700 font-semibold text-base rounded-xl shadow-lg shadow-black/10 transition-all hover:shadow-xl hover:scale-[1.01] active:scale-[0.99] border-0"
             >
-              {isLoading ? (
+              {loading ? (
                 <>
                   <Loader2 className="mr-3 h-5 w-5 animate-spin" />
                   Conectando...

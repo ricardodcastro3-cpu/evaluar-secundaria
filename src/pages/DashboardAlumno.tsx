@@ -51,13 +51,13 @@ const evaluacionesCompletadas = [
 
 export function DashboardAlumno() {
   const navigate = useNavigate()
-  const { usuario } = useAuthStore()
+  const { user } = useAuthStore()
 
   return (
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold tracking-tight">
-          ¡Hola, {usuario?.nombre}!
+          ¡Hola, {user?.nombre}!
         </h2>
         <p className="text-muted-foreground">
           Acá podés ver tus evaluaciones pendientes y resultados

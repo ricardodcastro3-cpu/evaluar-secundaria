@@ -1,19 +1,15 @@
-/**
- * Cliente de Supabase - Placeholder
- *
- * Cuando se conecte a Supabase, configurar:
- * - VITE_SUPABASE_URL
- * - VITE_SUPABASE_ANON_KEY
- */
+import { createClient, SupabaseClient } from "@supabase/supabase-js"
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || ""
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || ""
 
-export const supabaseConfig = {
-  url: SUPABASE_URL,
-  anonKey: SUPABASE_ANON_KEY,
-}
-
 export function isSupabaseConfigured(): boolean {
   return !!(SUPABASE_URL && SUPABASE_ANON_KEY)
 }
+
+// Only create client if Supabase is configured
+export const supabase: SupabaseClient | null = isSupabaseConfigured()
+  ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : null
+
+export default supabase

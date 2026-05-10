@@ -1,63 +1,155 @@
 import { create } from "zustand"
-import type { Usuario, Rol } from "@/types"
+import { supabase, isSupabaseConfigured } from "@/lib/supabase"
+import type { User } from "@supabase/supabase-js"
+
+interface AuthUser {
+  id: string
+  email: string
+  nombre: string
+  apellido: string
+  rol: "docente" | "alumno"
+  avatar_url?: string
+}
 
 interface AuthState {
-  usuario: Usuario | null
+  user: AuthUser | null
+  loading: boolean
+  isDocente: boolean
   isAuthenticated: boolean
-  isLoading: boolean
   error: string | null
-  login: (email: string, password: string) => Promise<void>
-  logout: () => void
-  setUsuario: (usuario: Usuario | null) => void
+
+  signInWithGoogle: () => Promise<void>
+  signOut: () => Promise<void>
+  checkSession: () => Promise<void>
   clearError: () => void
 }
 
-const mockDocente: Usuario = {
+function mapSupabaseUser(user: User): AuthUser {
+  const meta = user.user_metadata ?? {}
+  const fullName: string = meta.full_name || meta.name || ""
+  const parts = fullName.split(" ")
+  const nombre = parts[0] || ""
+  const apellido = parts.slice(1).join(" ") || ""
+
+  return {
+    id: user.id,
+    email: user.email ?? "",
+    nombre,
+    apellido,
+    rol: "docente",
+    avatar_url: meta.avatar_url || meta.picture,
+  }
+}
+
+async function resolveRol(user: User): Promise<"docente" | "alumno"> {
+  if (!isSupabaseConfigured() || !supabase) return "docente"
+
+  const { data } = await supabase
+    .from("docentes")
+    .select("id")
+    .eq("email", user.email ?? "")
+    .maybeSingle()
+
+  return data ? "docente" : "alumno"
+}
+
+const mockDocente: AuthUser = {
   id: "doc-1",
   email: "docente@evaluar.edu.ar",
   nombre: "María",
   apellido: "González",
-  rol: "docente" as Rol,
+  rol: "docente",
   avatar_url: undefined,
-  created_at: new Date().toISOString(),
 }
 
-const mockAlumno: Usuario = {
+const mockAlumno: AuthUser = {
   id: "alu-1",
   email: "alumno@evaluar.edu.ar",
   nombre: "Juan",
   apellido: "Pérez",
-  rol: "alumno" as Rol,
+  rol: "alumno",
   avatar_url: undefined,
-  created_at: new Date().toISOString(),
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
-  usuario: null,
+  user: null,
+  loading: true,
+  isDocente: false,
   isAuthenticated: false,
-  isLoading: false,
   error: null,
 
-  login: async (email: string, _password: string) => {
-    set({ isLoading: true, error: null })
-    await new Promise((resolve) => setTimeout(resolve, 800))
+  signInWithGoogle: async () => {
+    if (!isSupabaseConfigured() || !supabase) {
+      set({ loading: true, error: null })
+      await new Promise((r) => setTimeout(r, 600))
+      set({
+        user: mockDocente,
+        isDocente: true,
+        isAuthenticated: true,
+        loading: false,
+      })
+      return
+    }
 
-    if (email.includes("docente")) {
-      set({ usuario: mockDocente, isAuthenticated: true, isLoading: false })
-    } else if (email.includes("alumno")) {
-      set({ usuario: mockAlumno, isAuthenticated: true, isLoading: false })
-    } else {
-      set({ error: "Credenciales inválidas", isLoading: false })
+    set({ loading: true, error: null })
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/login`,
+      },
+    })
+
+    if (error) {
+      set({ error: error.message, loading: false })
     }
   },
 
-  logout: () => {
-    set({ usuario: null, isAuthenticated: false, error: null })
+  signOut: async () => {
+    if (isSupabaseConfigured() && supabase) {
+      await supabase.auth.signOut()
+    }
+    set({
+      user: null,
+      isDocente: false,
+      isAuthenticated: false,
+      error: null,
+      loading: false,
+    })
   },
 
-  setUsuario: (usuario) => {
-    set({ usuario, isAuthenticated: !!usuario })
+  checkSession: async () => {
+    if (!isSupabaseConfigured() || !supabase) {
+      set({ loading: false })
+      return
+    }
+
+    set({ loading: true })
+    const {
+      data: { session },
+    } = await supabase.auth.getSession()
+
+    if (session?.user) {
+      const rol = await resolveRol(session.user)
+      const mapped = mapSupabaseUser(session.user)
+      mapped.rol = rol
+      set({
+        user: mapped,
+        isDocente: rol === "docente",
+        isAuthenticated: true,
+        loading: false,
+      })
+    } else {
+      set({
+        user: null,
+        isDocente: false,
+        isAuthenticated: false,
+        loading: false,
+      })
+    }
   },
 
   clearError: () => set({ error: null }),
 }))
+
+export { mockDocente, mockAlumno }
+export type { AuthUser }

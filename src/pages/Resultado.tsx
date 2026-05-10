@@ -109,10 +109,10 @@ export function Resultado() {
   const navigate = useNavigate()
   const { id: _evaluacionId } = useParams()
   void _evaluacionId
-  const { usuario } = useAuthStore()
+  const { user } = useAuthStore()
 
   const r = resultadoMock
-  const esDocente = usuario?.rol === "docente"
+  const esDocente = user?.rol === "docente"
   const correctas = r.preguntas.filter((p) => p.correcta).length
 
   return (

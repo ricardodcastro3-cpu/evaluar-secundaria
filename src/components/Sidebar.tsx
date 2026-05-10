@@ -49,8 +49,8 @@ const alumnoLinks = [
 ]
 
 export function Sidebar({ open, onClose }: SidebarProps) {
-  const { usuario } = useAuthStore()
-  const links = usuario?.rol === "docente" ? docenteLinks : alumnoLinks
+  const { user } = useAuthStore()
+  const links = user?.rol === "docente" ? docenteLinks : alumnoLinks
 
   return (
     <>
@@ -99,10 +99,10 @@ export function Sidebar({ open, onClose }: SidebarProps) {
           <div className="border-t p-4">
             <div className="rounded-lg bg-muted/50 p-3">
               <p className="text-xs font-medium text-muted-foreground">
-                {usuario?.rol === "docente" ? "Panel Docente" : "Panel Alumno"}
+                {user?.rol === "docente" ? "Panel Docente" : "Panel Alumno"}
               </p>
               <p className="text-sm font-semibold mt-0.5">
-                {usuario?.nombre} {usuario?.apellido}
+                {user?.nombre} {user?.apellido}
               </p>
             </div>
           </div>
