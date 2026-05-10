@@ -80,13 +80,10 @@ export function Login() {
 
           <div className="space-y-2">
             <h1 className="text-4xl font-extrabold tracking-tight text-white">
-              Eval<span className="text-indigo-200">Ar</span>
+              EVALUACIONES SAN JUAN
             </h1>
-            <p className="text-lg text-indigo-100 font-medium">
-              Sistema de Evaluación
-            </p>
-            <p className="text-sm text-indigo-200/80">
-              Secundaria Argentina
+            <p className="text-sm text-indigo-200/80 max-w-xs mx-auto leading-relaxed">
+              Nivel Secundario — Ciclo Básico y Orientado — San Juan, República Argentina
             </p>
           </div>
         </div>
@@ -151,7 +148,7 @@ export function Login() {
         </div>
 
         <p className="text-center text-xs text-indigo-200/40">
-          EvalAr v1.0 · Ministerio de Educación
+          Diseño de propiedad intelectual del Profesor RICARDO DAMIÁN CASTRO — San Juan, República Argentina
         </p>
       </div>
     </div>

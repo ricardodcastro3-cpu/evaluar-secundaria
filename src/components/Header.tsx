@@ -50,11 +50,8 @@ export function Header({ onToggleSidebar }: HeaderProps) {
           </div>
           <div className="hidden sm:block">
             <h1 className="text-lg font-bold tracking-tight">
-              Eval<span className="text-primary">Ar</span>
+              EVALUACIONES <span className="text-primary">SAN JUAN</span>
             </h1>
-            <p className="text-[10px] leading-none text-muted-foreground -mt-0.5">
-              Secundaria
-            </p>
           </div>
         </div>
 

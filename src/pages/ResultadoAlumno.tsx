@@ -506,7 +506,7 @@ export function ResultadoAlumno() {
           </div>
 
           <p className="text-center text-xs text-muted-foreground">
-            EvalAr Secundaria v1.0 · Resultado generado el {r.fecha}
+            Diseño de propiedad intelectual del Profesor RICARDO DAMIÁN CASTRO — San Juan, República Argentina
           </p>
         </div>
       </div>

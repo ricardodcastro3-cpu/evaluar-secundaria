@@ -39,11 +39,11 @@ export function BienvenidaAlumno() {
             <GraduationCap className="h-9 w-9 text-primary" />
           </div>
           <div>
-            <h1 className="text-3xl font-extrabold tracking-tight">
-              Eval<span className="text-primary">Ar</span>
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+              EVALUACIONES SAN JUAN
             </h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              Sistema de Evaluación Secundaria
+            <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto leading-relaxed">
+              Nivel Secundario — Ciclo Básico y Orientado — San Juan, República Argentina
             </p>
           </div>
         </div>
@@ -173,7 +173,7 @@ export function BienvenidaAlumno() {
         </div>
 
         <p className="text-center text-xs text-muted-foreground mt-4">
-          EvalAr v1.0 · Si tenés problemas, contactá a tu docente
+          Diseño de propiedad intelectual del Profesor RICARDO DAMIÁN CASTRO — San Juan, República Argentina
         </p>
       </div>
     </div>
