@@ -1,23 +1,25 @@
 # AGENTS.md
 
-## Cursor Cloud specific instructions
+## Instrucciones específicas para Cursor Cloud
 
-This repository (`evaluar-secundaria`) is currently an empty project scaffold — it contains only a `README.md` placeholder. There is no application code, no dependencies, no build system, and no services to run.
+Este repositorio (`evaluar-secundaria`) es actualmente un proyecto vacío — solo contiene un `README.md` como marcador de posición. No hay código de aplicación, dependencias, sistema de compilación ni servicios para ejecutar.
 
-### Current state (as of initial setup)
+**Idioma del proyecto:** Español. Toda la documentación y comentarios deben estar en español.
 
-- **Language/framework:** Not yet chosen
-- **Package manager:** None
-- **Build system:** None
-- **Services:** None
-- **Database:** None
-- **Tests:** None
-- **Lint:** None
+### Estado actual (al momento de la configuración inicial)
 
-### For future agents
+- **Lenguaje/framework:** Aún no elegido
+- **Gestor de paquetes:** Ninguno
+- **Sistema de compilación:** Ninguno
+- **Servicios:** Ninguno
+- **Base de datos:** Ninguna
+- **Tests:** Ninguno
+- **Linter:** Ninguno
 
-Once the project has actual code and dependencies, this section should be updated with:
-- How to install dependencies (update script)
-- How to run the dev server
-- How to run tests and linting
-- Any non-obvious gotchas discovered during development
+### Para futuros agentes
+
+Una vez que el proyecto tenga código y dependencias reales, esta sección debe actualizarse con:
+- Cómo instalar dependencias (script de actualización)
+- Cómo ejecutar el servidor de desarrollo
+- Cómo ejecutar tests y linting
+- Cualquier problema no obvio descubierto durante el desarrollo
