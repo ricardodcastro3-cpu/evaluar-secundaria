@@ -49,7 +49,9 @@ export function Resultado() {
             <aside className="flex flex-col items-center justify-center rounded-3xl bg-primary p-6 text-center text-primary-foreground">
               <CheckCircle2 className="mb-4 h-14 w-14" />
               <p className="text-6xl font-black">{porcentaje}%</p>
-              <p className="mt-2 text-sm text-white/80">Aprobado con muy buen desempeno</p>
+              <p className="mt-2 text-sm text-white/80">
+                Incluye evaluacion completa, respuestas, claves, aciertos y rubrica.
+              </p>
             </aside>
           </CardContent>
         </Card>
@@ -61,7 +63,7 @@ export function Resultado() {
               Detalle por pregunta
             </CardTitle>
             <CardDescription>
-              Enunciado, respuesta dada, puntaje obtenido y justificacion breve.
+              Enunciado, respuesta dada, respuesta correcta, aciertos, puntaje y rubrica.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -72,26 +74,58 @@ export function Resultado() {
                     <Badge variant="outline">Pregunta {index + 1}</Badge>
                     <h2 className="mt-3 text-lg font-bold">{pregunta.enunciado}</h2>
                   </div>
-                  <div className="rounded-2xl bg-secondary px-4 py-3 text-center">
-                    <p className="text-xs text-muted-foreground">Puntaje</p>
-                    <p className="text-xl font-extrabold text-primary">
-                      {pregunta.puntajeObtenido}/{pregunta.puntajeMaximo}
-                    </p>
+                  <div className="flex flex-wrap gap-2">
+                    <Badge
+                      variant={
+                        pregunta.puntajeObtenido === pregunta.puntajeMaximo ? "success" : "warning"
+                      }
+                    >
+                      {pregunta.puntajeObtenido === pregunta.puntajeMaximo
+                        ? "Acierto completo"
+                        : "Acierto parcial"}
+                    </Badge>
+                    <div className="rounded-2xl bg-secondary px-4 py-3 text-center">
+                      <p className="text-xs text-muted-foreground">Puntaje</p>
+                      <p className="text-xl font-extrabold text-primary">
+                        {pregunta.puntajeObtenido}/{pregunta.puntajeMaximo}
+                      </p>
+                    </div>
                   </div>
                 </div>
 
-                <div className="mt-5 grid gap-4 lg:grid-cols-2">
+                <div className="mt-5 grid gap-4 lg:grid-cols-3">
                   <div className="rounded-2xl bg-muted p-4">
                     <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                       Respuesta dada
                     </p>
                     <p className="mt-2 text-sm leading-6">{pregunta.respuestaDada}</p>
                   </div>
+                  <div className="rounded-2xl bg-emerald-50 p-4 text-emerald-950 dark:bg-emerald-950/40 dark:text-emerald-100">
+                    <p className="text-xs font-semibold uppercase tracking-wide opacity-70">
+                      Respuesta correcta
+                    </p>
+                    <p className="mt-2 text-sm leading-6">{pregunta.respuestaCorrecta}</p>
+                  </div>
                   <div className="rounded-2xl bg-indigo-50 p-4 text-indigo-950 dark:bg-indigo-950/40 dark:text-indigo-100">
                     <p className="text-xs font-semibold uppercase tracking-wide opacity-70">
                       Justificacion breve
                     </p>
                     <p className="mt-2 text-sm leading-6">{pregunta.justificacion}</p>
+                  </div>
+                </div>
+
+                <div className="mt-4 rounded-2xl border bg-background p-4">
+                  <p className="text-sm font-bold">Rubrica aplicada</p>
+                  <div className="mt-3 grid gap-3 md:grid-cols-3">
+                    {pregunta.rubrica.map((criterio) => (
+                      <div key={criterio.criterio} className="rounded-xl bg-muted p-3">
+                        <div className="flex items-center justify-between gap-2">
+                          <p className="text-sm font-semibold">{criterio.criterio}</p>
+                          <Badge variant="outline">{criterio.puntaje} pts</Badge>
+                        </div>
+                        <p className="mt-2 text-xs text-muted-foreground">{criterio.descripcion}</p>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </article>

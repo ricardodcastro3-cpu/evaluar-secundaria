@@ -7,7 +7,7 @@ import { useAuthStore } from "@/store/authStore";
 const mobileLinks = [
   { to: "/dashboard", label: "Evaluaciones" },
   { to: "/nueva-evaluacion", label: "Nueva" },
-  { to: "/subir-alumnos", label: "Alumnos" },
+  { to: "/subir-alumnos", label: "Conectados" },
   { to: "/resultado", label: "Reportes" },
 ];
 

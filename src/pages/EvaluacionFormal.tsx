@@ -7,7 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
-import { evaluacionAlumnoMock, tokenDemo } from "@/lib/alumnoFlowMock";
+import {
+  evaluacionAlumnoMock,
+  getFastTrackResultsKey,
+  getFormalStartedKey,
+  tokenDemo,
+} from "@/lib/alumnoFlowMock";
 
 export function EvaluacionFormal() {
   const navigate = useNavigate();
@@ -29,12 +34,15 @@ export function EvaluacionFormal() {
   }, [segundosRestantes]);
 
   useEffect(() => {
+    window.localStorage.setItem(getFormalStartedKey(token), "true");
+    window.localStorage.removeItem(getFastTrackResultsKey(token));
+
     const interval = window.setInterval(() => {
       setSegundosRestantes((actual) => Math.max(0, actual - 1));
     }, 1000);
 
     return () => window.clearInterval(interval);
-  }, []);
+  }, [token]);
 
   useEffect(() => {
     const registrarCambio = () => {
@@ -80,7 +88,7 @@ export function EvaluacionFormal() {
                   EVALUACIÓN FORMAL - No se puede pausar ni reiniciar
                 </p>
                 <p className="text-sm text-white/80">
-                  La salida de pantalla queda registrada en esta instancia.
+                  Se borraron las practicas Fast Track y ya no se puede volver a simular.
                 </p>
               </div>
             </div>
@@ -126,7 +134,7 @@ export function EvaluacionFormal() {
           <CardHeader>
             <CardTitle className="text-2xl">{pregunta.enunciado}</CardTitle>
             <CardDescription>
-              Responde con atencion. Esta instancia tiene una sola oportunidad.
+              Responde con atencion. Esta version fue generada por IA especificamente para vos.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">

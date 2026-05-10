@@ -79,8 +79,8 @@ export function DashboardDocente() {
           <Badge variant="secondary">Dashboard docente</Badge>
           <h1 className="mt-3 text-3xl font-bold tracking-tight">Mis Evaluaciones</h1>
           <p className="mt-2 max-w-2xl text-muted-foreground">
-            Vista general de evaluaciones activas, borradores y seguimiento de alumnos con datos
-            mock realistas.
+            Vista general de evaluaciones activas y alumnos que se conectan automaticamente desde
+            el link compartido.
           </p>
         </div>
         <Button asChild size="lg" className="h-12 shrink-0 shadow-lg shadow-indigo-500/20">
@@ -136,7 +136,7 @@ export function DashboardDocente() {
             </CardDescription>
           </div>
           <Button asChild variant="outline">
-            <Link to="/subir-alumnos">Gestionar alumnos</Link>
+            <Link to="/subir-alumnos">Ver alumnos conectados</Link>
           </Button>
         </CardHeader>
         <CardContent>

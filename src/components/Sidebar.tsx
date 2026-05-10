@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 const docenteLinks = [
   { to: "/dashboard", label: "Mis Evaluaciones", icon: ClipboardCheck },
   { to: "/nueva-evaluacion", label: "Nueva Evaluacion", icon: Sparkles },
-  { to: "/subir-alumnos", label: "Alumnos", icon: Users },
+  { to: "/subir-alumnos", label: "Alumnos conectados", icon: Users },
   { to: "/resultado", label: "Reportes", icon: BarChart3 },
 ];
 

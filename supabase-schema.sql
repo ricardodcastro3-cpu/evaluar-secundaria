@@ -45,15 +45,20 @@ create table if not exists public.versiones (
 create table if not exists public.alumnos_eval (
   id uuid primary key default gen_random_uuid(),
   evaluacion_id uuid not null references public.evaluaciones (id) on delete cascade,
+  auth_user_id uuid references auth.users (id) on delete set null,
   nombre text not null,
   apellido text not null,
-  dni text not null,
-  email text,
+  dni text,
+  email text not null,
   division text not null,
-  version_asignada int not null default 1 check (version_asignada > 0),
+  version_asignada int not null check (version_asignada > 0),
   token_unico uuid not null default gen_random_uuid(),
+  login_at timestamptz,
+  evaluacion_formal_iniciada boolean not null default false,
+  fasttrack_habilitado boolean not null default true,
+  fasttrack_intentos int not null default 0 check (fasttrack_intentos >= 0),
   created_at timestamptz not null default now(),
-  unique (evaluacion_id, dni),
+  unique (evaluacion_id, email),
   unique (token_unico)
 );
 
@@ -61,6 +66,7 @@ create table if not exists public.sesiones (
   id uuid primary key default gen_random_uuid(),
   alumno_eval_id uuid not null references public.alumnos_eval (id) on delete cascade,
   tipo text not null check (tipo in ('fasttrack', 'formal')),
+  numero_intento int not null default 1 check (numero_intento > 0),
   inicio timestamptz not null default now(),
   fin timestamptz,
   puntaje int,
@@ -73,8 +79,11 @@ create table if not exists public.respuestas (
   sesion_id uuid not null references public.sesiones (id) on delete cascade,
   item_id uuid not null,
   respuesta_dada text,
+  respuesta_correcta text,
+  acierto boolean not null default false,
   puntaje_obtenido int not null default 0 check (puntaje_obtenido >= 0),
-  justificacion text
+  justificacion text,
+  rubrica jsonb not null default '[]'::jsonb
 );
 
 -- =========================
@@ -84,6 +93,8 @@ create table if not exists public.respuestas (
 create index if not exists evaluaciones_docente_id_idx on public.evaluaciones (docente_id);
 create index if not exists versiones_evaluacion_id_idx on public.versiones (evaluacion_id);
 create index if not exists alumnos_eval_evaluacion_id_idx on public.alumnos_eval (evaluacion_id);
+create index if not exists alumnos_eval_auth_user_id_idx on public.alumnos_eval (auth_user_id);
+create index if not exists alumnos_eval_apellido_nombre_idx on public.alumnos_eval (apellido, nombre);
 create index if not exists alumnos_eval_token_unico_idx on public.alumnos_eval (token_unico);
 create index if not exists sesiones_alumno_eval_id_idx on public.sesiones (alumno_eval_id);
 create index if not exists respuestas_sesion_id_idx on public.respuestas (sesion_id);
@@ -236,6 +247,13 @@ using (
   )
 );
 
+drop policy if exists "alumnos_eval_select_own_student" on public.alumnos_eval;
+create policy "alumnos_eval_select_own_student"
+on public.alumnos_eval
+for select
+to authenticated
+using (auth_user_id = auth.uid());
+
 drop policy if exists "alumnos_eval_insert_by_docente" on public.alumnos_eval;
 create policy "alumnos_eval_insert_by_docente"
 on public.alumnos_eval
@@ -272,6 +290,14 @@ with check (
   )
 );
 
+drop policy if exists "alumnos_eval_update_own_student_runtime" on public.alumnos_eval;
+create policy "alumnos_eval_update_own_student_runtime"
+on public.alumnos_eval
+for update
+to authenticated
+using (auth_user_id = auth.uid())
+with check (auth_user_id = auth.uid());
+
 drop policy if exists "alumnos_eval_delete_by_docente" on public.alumnos_eval;
 create policy "alumnos_eval_delete_by_docente"
 on public.alumnos_eval
@@ -303,6 +329,20 @@ using (
   )
 );
 
+drop policy if exists "sesiones_select_own_student" on public.sesiones;
+create policy "sesiones_select_own_student"
+on public.sesiones
+for select
+to authenticated
+using (
+  exists (
+    select 1
+    from public.alumnos_eval ae
+    where ae.id = sesiones.alumno_eval_id
+      and ae.auth_user_id = auth.uid()
+  )
+);
+
 drop policy if exists "sesiones_insert_by_docente" on public.sesiones;
 create policy "sesiones_insert_by_docente"
 on public.sesiones
@@ -315,6 +355,24 @@ with check (
     join public.evaluaciones e on e.id = ae.evaluacion_id
     where ae.id = sesiones.alumno_eval_id
       and e.docente_id = auth.uid()
+  )
+);
+
+drop policy if exists "sesiones_insert_own_student" on public.sesiones;
+create policy "sesiones_insert_own_student"
+on public.sesiones
+for insert
+to authenticated
+with check (
+  exists (
+    select 1
+    from public.alumnos_eval ae
+    where ae.id = sesiones.alumno_eval_id
+      and ae.auth_user_id = auth.uid()
+      and (
+        sesiones.tipo = 'formal'
+        or (sesiones.tipo = 'fasttrack' and ae.fasttrack_habilitado = true)
+      )
   )
 );
 
@@ -342,6 +400,28 @@ with check (
   )
 );
 
+drop policy if exists "sesiones_update_own_student" on public.sesiones;
+create policy "sesiones_update_own_student"
+on public.sesiones
+for update
+to authenticated
+using (
+  exists (
+    select 1
+    from public.alumnos_eval ae
+    where ae.id = sesiones.alumno_eval_id
+      and ae.auth_user_id = auth.uid()
+  )
+)
+with check (
+  exists (
+    select 1
+    from public.alumnos_eval ae
+    where ae.id = sesiones.alumno_eval_id
+      and ae.auth_user_id = auth.uid()
+  )
+);
+
 -- RESPUESTAS
 
 drop policy if exists "respuestas_select_by_docente" on public.respuestas;
@@ -360,6 +440,21 @@ using (
   )
 );
 
+drop policy if exists "respuestas_select_own_student" on public.respuestas;
+create policy "respuestas_select_own_student"
+on public.respuestas
+for select
+to authenticated
+using (
+  exists (
+    select 1
+    from public.sesiones s
+    join public.alumnos_eval ae on ae.id = s.alumno_eval_id
+    where s.id = respuestas.sesion_id
+      and ae.auth_user_id = auth.uid()
+  )
+);
+
 drop policy if exists "respuestas_insert_by_docente" on public.respuestas;
 create policy "respuestas_insert_by_docente"
 on public.respuestas
@@ -373,6 +468,21 @@ with check (
     join public.evaluaciones e on e.id = ae.evaluacion_id
     where s.id = respuestas.sesion_id
       and e.docente_id = auth.uid()
+  )
+);
+
+drop policy if exists "respuestas_insert_own_student" on public.respuestas;
+create policy "respuestas_insert_own_student"
+on public.respuestas
+for insert
+to authenticated
+with check (
+  exists (
+    select 1
+    from public.sesiones s
+    join public.alumnos_eval ae on ae.id = s.alumno_eval_id
+    where s.id = respuestas.sesion_id
+      and ae.auth_user_id = auth.uid()
   )
 );
 
@@ -402,7 +512,36 @@ with check (
   )
 );
 
+drop policy if exists "respuestas_update_own_student" on public.respuestas;
+create policy "respuestas_update_own_student"
+on public.respuestas
+for update
+to authenticated
+using (
+  exists (
+    select 1
+    from public.sesiones s
+    join public.alumnos_eval ae on ae.id = s.alumno_eval_id
+    where s.id = respuestas.sesion_id
+      and ae.auth_user_id = auth.uid()
+  )
+)
+with check (
+  exists (
+    select 1
+    from public.sesiones s
+    join public.alumnos_eval ae on ae.id = s.alumno_eval_id
+    where s.id = respuestas.sesion_id
+      and ae.auth_user_id = auth.uid()
+  )
+);
+
 -- Nota:
--- Para accesos publicos por token_unico de alumnos, se recomienda exponer RPCs o Edge Functions
--- que validen el token y operen con SECURITY DEFINER. Las policies anteriores priorizan un RLS
--- seguro para docentes autenticados y evitan exponer alumnos_eval completos al rol anon.
+-- Para accesos por token_unico, el flujo recomendado es resolver el token en una RPC o Edge Function
+-- SECURITY DEFINER que cree/asocie alumnos_eval al auth.users.id del alumno logueado. Desde ese
+-- momento las policies auth_user_id = auth.uid() permiten que el alumno practique Fast Track, inicie
+-- formal y lea su reporte sin exponer listados completos al rol anon.
+-- Al crear una sesion formal, la aplicacion/backend debe setear:
+--   alumnos_eval.evaluacion_formal_iniciada = true
+--   alumnos_eval.fasttrack_habilitado = false
+-- y eliminar/ignorar sesiones Fast Track previas para que no computen como nota definitiva.

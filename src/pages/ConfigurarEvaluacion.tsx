@@ -1,4 +1,4 @@
-import { Check, FileUp, Loader2, Sparkles, UploadCloud, Users } from "lucide-react";
+import { Check, Copy, Link2, Loader2, Sparkles, UploadCloud, Users } from "lucide-react";
 import { useState } from "react";
 import { AlertMessage } from "@/components/AlertMessage";
 import { Badge } from "@/components/ui/badge";
@@ -7,35 +7,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
+import { alumnosConectadosMock, tokenDemo } from "@/lib/alumnoFlowMock";
 
 const pasos = [
   "Datos basicos",
-  "Contenidos y puntajes",
-  "Lista de alumnos",
-];
-
-const alumnosMock = [
-  {
-    nombre: "Mateo",
-    apellido: "Garcia",
-    dni: "45123456",
-    email: "mateo.garcia@estudiante.edu.ar",
-    division: "B",
-  },
-  {
-    nombre: "Sofia",
-    apellido: "Molina",
-    dni: "45234567",
-    email: "sofia.molina@estudiante.edu.ar",
-    division: "B",
-  },
-  {
-    nombre: "Tomas",
-    apellido: "Pereyra",
-    dni: "45345678",
-    email: "tomas.pereyra@estudiante.edu.ar",
-    division: "B",
-  },
+  "Contenido e IA",
+  "Link y alumnos conectados",
 ];
 
 export function ConfigurarEvaluacion() {
@@ -55,8 +32,8 @@ export function ConfigurarEvaluacion() {
             <Badge variant="secondary">Nueva Evaluacion</Badge>
             <h1 className="mt-3 text-3xl font-bold tracking-tight">Configurar Evaluación</h1>
             <p className="mt-2 max-w-2xl text-muted-foreground">
-              Formulario guiado de 3 pasos para cargar datos, contenidos y alumnos antes de generar
-              una evaluacion con IA.
+              El docente carga el contenido y comparte el link. Los alumnos aparecen automaticamente
+              al ingresar, ordenados alfabeticamente, y cada uno recibe una version IA diferente.
             </p>
           </div>
           <Button
@@ -119,7 +96,7 @@ export function ConfigurarEvaluacion() {
 
       {pasoActivo === 0 ? <PasoDatosBasicos /> : null}
       {pasoActivo === 1 ? <PasoContenidos /> : null}
-      {pasoActivo === 2 ? <PasoAlumnos /> : null}
+      {pasoActivo === 2 ? <PasoLinkYAlumnos /> : null}
 
       <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-between">
         <Button
@@ -143,8 +120,8 @@ export function ConfigurarEvaluacion() {
 
       <AlertMessage
         tipo="info"
-        titulo="Sin backend por ahora"
-        descripcion="Todos los datos son mock. La carga de archivos, Excel e IA quedan listos visualmente para conectar mas adelante."
+        titulo="Los alumnos no se cargan manualmente"
+        descripcion="El listado se forma automaticamente con quienes reciben el link, ingresan al sistema y se loguean para rendir."
       />
     </div>
   );
@@ -207,8 +184,11 @@ function PasoContenidos() {
     <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
       <Card>
         <CardHeader>
-          <CardTitle>Paso 2: Subir archivo de contenidos</CardTitle>
-          <CardDescription>Arrastra material en .pdf, .docx o .xlsx para generar consignas.</CardDescription>
+          <CardTitle>Paso 2: Archivo fuente para IA</CardTitle>
+          <CardDescription>
+            Arrastra material en .pdf, .docx o .xlsx. A partir de ese contenido se genera una
+            evaluacion distinta para cada alumno logueado.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <label
@@ -216,10 +196,9 @@ function PasoContenidos() {
             className="flex min-h-72 cursor-pointer flex-col items-center justify-center rounded-3xl border border-dashed bg-muted/60 p-8 text-center transition hover:bg-accent"
           >
             <UploadCloud className="mb-4 h-12 w-12 text-primary" />
-            <span className="text-lg font-bold">Drag & drop de contenidos</span>
+            <span className="text-lg font-bold">Drag & drop del documento base</span>
             <span className="mt-2 max-w-sm text-sm text-muted-foreground">
-              Selecciona o arrastra archivos .pdf, .docx o .xlsx. En esta demo no se suben a ningun
-              servidor.
+              El docente solo adjunta el documento. No carga alumnos ni versiones manuales.
             </span>
             <Input id="contenidos" type="file" className="hidden" accept=".pdf,.docx,.xlsx" />
             <Badge variant="secondary" className="mt-5">
@@ -231,8 +210,10 @@ function PasoContenidos() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Configurar puntajes</CardTitle>
-          <CardDescription>Distribucion sugerida para una evaluacion de 100 puntos.</CardDescription>
+          <CardTitle>Configurar criterios y puntajes</CardTitle>
+          <CardDescription>
+            La IA usa estos criterios para armar consignas, respuestas esperadas y rubricas por alumno.
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {[
@@ -257,64 +238,84 @@ function PasoContenidos() {
   );
 }
 
-function PasoAlumnos() {
+function PasoLinkYAlumnos() {
+  const linkDemo = `${window.location.origin}/eval/${tokenDemo}`;
+
   return (
     <Card>
       <CardHeader className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <CardTitle>Paso 3: Cargar lista de alumnos</CardTitle>
+          <CardTitle>Paso 3: Link y alumnos conectados</CardTitle>
           <CardDescription>
-            Tabla editable o upload de Excel con columnas: nombre, apellido, DNI, email y division.
+            Comparte el link. El listado se genera automaticamente con los alumnos que ingresan y se
+            loguean.
           </CardDescription>
         </div>
-        <Button variant="outline">
-          <FileUp className="h-4 w-4" />
-          Upload Excel
+        <Button variant="outline" type="button">
+          <Copy className="h-4 w-4" />
+          Copiar link
         </Button>
       </CardHeader>
       <CardContent className="space-y-5">
-        <div className="flex flex-col gap-3 rounded-2xl border border-dashed bg-muted/60 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="grid gap-4 lg:grid-cols-[1fr_0.7fr]">
+          <div className="rounded-2xl border bg-muted/60 p-4">
+            <Label htmlFor="link-evaluacion">Link de conexion para alumnos</Label>
+            <div className="mt-2 flex gap-2">
+              <Input id="link-evaluacion" readOnly value={linkDemo} />
+              <Button variant="secondary" size="icon" aria-label="Copiar link">
+                <Link2 className="h-4 w-4" />
+              </Button>
+            </div>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Al loguearse desde este link, el alumno queda asociado a la evaluacion y recibe una
+              version IA unica.
+            </p>
+          </div>
+          <div className="rounded-2xl border bg-secondary p-4">
+            <Users className="mb-3 h-5 w-5 text-primary" />
+            <p className="text-3xl font-extrabold">{alumnosConectadosMock.length}</p>
+            <p className="text-sm text-muted-foreground">Alumnos conectados automaticamente</p>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-3 rounded-2xl border bg-muted/60 p-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
               <Users className="h-5 w-5" />
             </div>
             <div>
-              <p className="font-semibold">Planilla de alumnos 4to B</p>
-              <p className="text-sm text-muted-foreground">Datos mock editables en pantalla.</p>
+              <p className="font-semibold">Listado alfabetico generado por login</p>
+              <p className="text-sm text-muted-foreground">
+                El docente no importa planillas ni agrega estudiantes manualmente.
+              </p>
             </div>
           </div>
-          <Badge variant="success">{alumnosMock.length} alumnos cargados</Badge>
+          <Badge variant="success">Ordenado A-Z</Badge>
         </div>
 
         <div className="overflow-x-auto rounded-2xl border">
-          <table className="w-full min-w-[860px] border-collapse text-left text-sm">
+          <table className="w-full min-w-[780px] border-collapse text-left text-sm">
             <thead className="bg-muted text-xs uppercase tracking-wide text-muted-foreground">
               <tr>
-                <th className="px-4 py-3 font-semibold">Nombre</th>
                 <th className="px-4 py-3 font-semibold">Apellido</th>
-                <th className="px-4 py-3 font-semibold">DNI</th>
+                <th className="px-4 py-3 font-semibold">Nombre</th>
                 <th className="px-4 py-3 font-semibold">Email</th>
-                <th className="px-4 py-3 font-semibold">Division</th>
+                <th className="px-4 py-3 font-semibold">Estado</th>
+                <th className="px-4 py-3 font-semibold">Version IA</th>
               </tr>
             </thead>
             <tbody className="divide-y">
-              {alumnosMock.map((alumno) => (
-                <tr key={alumno.dni} className="bg-card">
-                  <td className="px-4 py-3">
-                    <Input defaultValue={alumno.nombre} aria-label="Nombre alumno" />
+              {alumnosConectadosMock.map((alumno) => (
+                <tr key={alumno.email} className="bg-card">
+                  <td className="px-4 py-4 font-semibold">{alumno.apellido}</td>
+                  <td className="px-4 py-4">{alumno.nombre}</td>
+                  <td className="px-4 py-4 text-muted-foreground">{alumno.email}</td>
+                  <td className="px-4 py-4">
+                    <Badge variant={alumno.estado === "Resultado disponible" ? "success" : "secondary"}>
+                      {alumno.estado}
+                    </Badge>
                   </td>
-                  <td className="px-4 py-3">
-                    <Input defaultValue={alumno.apellido} aria-label="Apellido alumno" />
-                  </td>
-                  <td className="px-4 py-3">
-                    <Input defaultValue={alumno.dni} aria-label="DNI alumno" />
-                  </td>
-                  <td className="px-4 py-3">
-                    <Input defaultValue={alumno.email} type="email" aria-label="Email alumno" />
-                  </td>
-                  <td className="px-4 py-3">
-                    <Input defaultValue={alumno.division} aria-label="Division alumno" />
-                  </td>
+                  <td className="px-4 py-4 font-semibold">{alumno.version}</td>
                 </tr>
               ))}
             </tbody>

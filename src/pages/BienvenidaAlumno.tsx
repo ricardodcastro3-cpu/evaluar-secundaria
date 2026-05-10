@@ -1,12 +1,18 @@
 import { AlertTriangle, CalendarDays, Clock3, GraduationCap, PlayCircle, UserRound } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { evaluacionAlumnoMock, tokenDemo } from "@/lib/alumnoFlowMock";
+import { evaluacionAlumnoMock, getFormalStartedKey, tokenDemo } from "@/lib/alumnoFlowMock";
 
 export function BienvenidaAlumno() {
   const { token = tokenDemo } = useParams();
+  const [formalIniciada, setFormalIniciada] = useState(false);
+
+  useEffect(() => {
+    setFormalIniciada(window.localStorage.getItem(getFormalStartedKey(token)) === "true");
+  }, [token]);
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-slate-100 px-4 py-8 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950">
@@ -19,8 +25,8 @@ export function BienvenidaAlumno() {
                 Hola, {evaluacionAlumnoMock.alumno}
               </h1>
               <p className="mt-4 max-w-2xl text-lg text-muted-foreground">
-                Tenes una evaluacion asignada. Podes practicar primero con Fast Track o iniciar la
-                instancia formal cuando estes listo.
+                Tenes una evaluacion unica generada por IA a partir del material cargado por tu
+                docente. Podes practicar con Fast Track hasta iniciar la evaluacion formal.
               </p>
 
               <div className="mt-8 grid gap-4 sm:grid-cols-2">
@@ -35,6 +41,7 @@ export function BienvenidaAlumno() {
                   <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" />
                   <p className="font-semibold">
                     La evaluación formal tiene una sola oportunidad. No podrás repetirla.
+                    {formalIniciada ? " Fast Track quedo bloqueado porque ya iniciaste la evaluacion." : ""}
                   </p>
                 </div>
               </div>
@@ -47,21 +54,29 @@ export function BienvenidaAlumno() {
                 </p>
                 <h2 className="mt-3 text-3xl font-bold">Elegí cómo comenzar</h2>
                 <p className="mt-3 text-sm leading-6 text-white/75">
-                  Fast Track es una practica ilimitada. La evaluacion formal registra tu entrega
-                  definitiva.
+                  Fast Track es practica ilimitada y no cuenta como nota. Al iniciar la evaluacion
+                  formal se borran esas practicas y queda registrada tu entrega definitiva.
                 </p>
               </div>
 
               <div className="mt-6 grid gap-4">
                 <Button
-                  asChild
+                  asChild={!formalIniciada}
+                  disabled={formalIniciada}
                   size="lg"
                   className="h-16 bg-emerald-500 text-base text-white shadow-lg shadow-emerald-900/20 hover:bg-emerald-600"
                 >
-                  <Link to={`/fast-track/${token}`}>
-                    <PlayCircle className="h-6 w-6" />
-                    Practicar con Fast Track
-                  </Link>
+                  {formalIniciada ? (
+                    <>
+                      <PlayCircle className="h-6 w-6" />
+                      Fast Track bloqueado
+                    </>
+                  ) : (
+                    <Link to={`/fast-track/${token}`}>
+                      <PlayCircle className="h-6 w-6" />
+                      Practicar con Fast Track
+                    </Link>
+                  )}
                 </Button>
                 <Button asChild size="lg" variant="secondary" className="h-16 text-base">
                   <Link to={`/evaluacion/${token}`}>

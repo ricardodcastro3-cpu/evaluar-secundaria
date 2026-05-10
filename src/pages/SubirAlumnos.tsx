@@ -1,114 +1,91 @@
-import { FileSpreadsheet, UploadCloud, UserPlus } from "lucide-react";
+import { Link2, Users } from "lucide-react";
 import { AlertMessage } from "@/components/AlertMessage";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Progress } from "@/components/ui/progress";
-import { useAlumnoStore } from "@/store/alumnoStore";
+import { alumnosConectadosMock, tokenDemo } from "@/lib/alumnoFlowMock";
 
 export function SubirAlumnos() {
-  const alumnos = useAlumnoStore((state) => state.alumnos);
+  const linkDemo = `${window.location.origin}/eval/${tokenDemo}`;
 
   return (
     <div className="space-y-6">
       <div>
-        <Badge variant="secondary">Gestion de cursos</Badge>
-        <h1 className="mt-3 text-3xl font-bold tracking-tight">Subir alumnos</h1>
-        <p className="mt-2 text-muted-foreground">
-          Carga manual o importa una planilla para preparar las evaluaciones.
+        <Badge variant="secondary">Alumnos conectados</Badge>
+        <h1 className="mt-3 text-3xl font-bold tracking-tight">Listado automatico de alumnos</h1>
+        <p className="mt-2 max-w-3xl text-muted-foreground">
+          El docente no genera ni carga listados. Los alumnos aparecen al recibir el link, ingresar al
+          sistema y loguearse para rendir.
         </p>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-        <Card className="border-dashed">
+      <AlertMessage
+        tipo="info"
+        titulo="Alta automatica por link"
+        descripcion="El sistema ordena alfabeticamente a los alumnos conectados y asigna una version IA diferente para cada uno."
+      />
+
+      <div className="grid gap-6 lg:grid-cols-[1fr_0.65fr]">
+        <Card>
           <CardHeader>
-            <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary text-primary">
-              <UploadCloud className="h-6 w-6" />
-            </div>
-            <CardTitle>Importar planilla</CardTitle>
-            <CardDescription>Formato sugerido: nombre, apellido, DNI, email y curso.</CardDescription>
+            <CardTitle>Link de conexion</CardTitle>
+            <CardDescription>Comparte este enlace con el curso. El login del alumno crea el registro.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <label
-              htmlFor="archivo"
-              className="flex min-h-44 cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed bg-muted/60 p-6 text-center transition hover:bg-accent"
-            >
-              <FileSpreadsheet className="mb-3 h-10 w-10 text-primary" />
-              <span className="font-semibold">Arrastra un CSV/XLSX o selecciona un archivo</span>
-              <span className="mt-1 text-sm text-muted-foreground">Carga demo, sin envio a servidor</span>
-              <Input id="archivo" type="file" className="hidden" accept=".csv,.xlsx" />
-            </label>
-            <Button className="w-full">
-              <UploadCloud className="h-4 w-4" />
-              Procesar archivo
+          <CardContent className="flex flex-col gap-3 sm:flex-row">
+            <Input readOnly value={linkDemo} aria-label="Link de conexion alumno" />
+            <Button type="button">
+              <Link2 className="h-4 w-4" />
+              Copiar link
             </Button>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader>
-            <CardTitle>Carga manual</CardTitle>
-            <CardDescription>Agrega estudiantes individuales al curso seleccionado.</CardDescription>
-          </CardHeader>
-          <CardContent className="grid gap-4 sm:grid-cols-2">
-            <div className="grid gap-2">
-              <Label htmlFor="nombre">Nombre</Label>
-              <Input id="nombre" placeholder="Lucia" />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="apellido">Apellido</Label>
-              <Input id="apellido" placeholder="Rodriguez" />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="dni">DNI</Label>
-              <Input id="dni" placeholder="45111222" />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="mail">Email</Label>
-              <Input id="mail" type="email" placeholder="lucia@estudiante.edu.ar" />
-            </div>
-            <Button className="sm:col-span-2">
-              <UserPlus className="h-4 w-4" />
-              Agregar alumno
-            </Button>
+          <CardContent className="p-6">
+            <Users className="mb-3 h-6 w-6 text-primary" />
+            <p className="text-4xl font-extrabold">{alumnosConectadosMock.length}</p>
+            <p className="text-sm text-muted-foreground">Alumnos conectados hasta ahora</p>
           </CardContent>
         </Card>
       </div>
 
-      <AlertMessage
-        tipo="success"
-        titulo="Curso demo listo"
-        descripcion={`${alumnos.length} alumnos disponibles para probar el flujo de evaluacion.`}
-      />
-
       <Card>
         <CardHeader>
-          <CardTitle>Alumnos cargados</CardTitle>
-          <CardDescription>Vista previa de datos importados.</CardDescription>
+          <CardTitle>Listado generado automaticamente</CardTitle>
+          <CardDescription>
+            Orden alfabetico por apellido. El docente solo monitorea estados y versiones asignadas.
+          </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          {alumnos.map((alumno) => (
-            <div
-              key={alumno.id}
-              className="grid gap-3 rounded-xl border p-4 sm:grid-cols-[1fr_9rem] sm:items-center"
-            >
-              <div>
-                <p className="font-semibold">
-                  {alumno.apellido}, {alumno.nombre}
-                </p>
-                <p className="text-sm text-muted-foreground">DNI {alumno.dni} · {alumno.email}</p>
-              </div>
-              <div>
-                <div className="mb-2 flex justify-between text-xs text-muted-foreground">
-                  <span>Progreso</span>
-                  <span>{alumno.progreso}%</span>
-                </div>
-                <Progress value={alumno.progreso} />
-              </div>
-            </div>
-          ))}
+        <CardContent>
+          <div className="overflow-x-auto rounded-2xl border">
+            <table className="w-full min-w-[820px] border-collapse text-left text-sm">
+              <thead className="bg-muted text-xs uppercase tracking-wide text-muted-foreground">
+                <tr>
+                  <th className="px-4 py-3 font-semibold">Apellido</th>
+                  <th className="px-4 py-3 font-semibold">Nombre</th>
+                  <th className="px-4 py-3 font-semibold">Email</th>
+                  <th className="px-4 py-3 font-semibold">Estado</th>
+                  <th className="px-4 py-3 font-semibold">Version IA asignada</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y">
+                {alumnosConectadosMock.map((alumno) => (
+                  <tr key={alumno.email} className="bg-card transition hover:bg-muted/60">
+                    <td className="px-4 py-4 font-semibold">{alumno.apellido}</td>
+                    <td className="px-4 py-4">{alumno.nombre}</td>
+                    <td className="px-4 py-4 text-muted-foreground">{alumno.email}</td>
+                    <td className="px-4 py-4">
+                      <Badge variant={alumno.estado === "Resultado disponible" ? "success" : "secondary"}>
+                        {alumno.estado}
+                      </Badge>
+                    </td>
+                    <td className="px-4 py-4 font-semibold">{alumno.version}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </CardContent>
       </Card>
     </div>
