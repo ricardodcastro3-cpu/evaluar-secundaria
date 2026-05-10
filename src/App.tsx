@@ -9,6 +9,10 @@ import { DashboardAlumno } from "@/pages/DashboardAlumno"
 import { FastTrack } from "@/pages/FastTrack"
 import { EvaluacionFormal } from "@/pages/EvaluacionFormal"
 import { Resultado } from "@/pages/Resultado"
+import { BienvenidaAlumno } from "@/pages/BienvenidaAlumno"
+import { FastTrackAlumno } from "@/pages/FastTrackAlumno"
+import { EvaluacionFormalAlumno } from "@/pages/EvaluacionFormalAlumno"
+import { ResultadoAlumno } from "@/pages/ResultadoAlumno"
 import { useAuthStore } from "@/store/authStore"
 
 function ProtectedRoute({
@@ -110,6 +114,12 @@ export default function App() {
               }
             />
           </Route>
+
+          {/* Rutas públicas del flujo alumno por token */}
+          <Route path="/eval/:token" element={<BienvenidaAlumno />} />
+          <Route path="/fast-track/:token" element={<FastTrackAlumno />} />
+          <Route path="/evaluacion/:token" element={<EvaluacionFormalAlumno />} />
+          <Route path="/resultado/:token" element={<ResultadoAlumno />} />
 
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/docente" element={<Navigate to="/dashboard" replace />} />
