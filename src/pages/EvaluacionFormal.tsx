@@ -1,4 +1,4 @@
-import { AlertTriangle, ArrowRight, Clock3, Send, ShieldAlert, X } from "lucide-react";
+import { AlertTriangle, ArrowLeft, ArrowRight, Clock3, Send, ShieldAlert, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AlertMessage } from "@/components/AlertMessage";
@@ -71,6 +71,10 @@ export function EvaluacionFormal() {
     setPreguntaActual((actual) => actual + 1);
   };
 
+  const retroceder = () => {
+    setPreguntaActual((actual) => Math.max(0, actual - 1));
+  };
+
   const finalizar = () => {
     setMostrarModal(false);
     navigate(`/resultado/${token}`);
@@ -134,7 +138,8 @@ export function EvaluacionFormal() {
           <CardHeader>
             <CardTitle className="text-2xl">{pregunta.enunciado}</CardTitle>
             <CardDescription>
-              Responde con atencion. Esta version fue generada por IA especificamente para vos.
+              Responde con atencion. Podes volver a items anteriores para revisar y modificar tus
+              respuestas antes de finalizar.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
@@ -172,7 +177,33 @@ export function EvaluacionFormal() {
               </div>
             )}
 
-            <div className="flex justify-end border-t pt-5">
+            <div className="rounded-2xl bg-muted p-4">
+              <p className="text-sm font-semibold">Revision antes de finalizar</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {evaluacionAlumnoMock.preguntas.map((item, index) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => setPreguntaActual(index)}
+                    className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
+                      index === preguntaActual
+                        ? "bg-primary text-primary-foreground"
+                        : respuestas[item.id]
+                          ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300"
+                          : "bg-background text-muted-foreground"
+                    }`}
+                  >
+                    Item {index + 1}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex flex-col-reverse justify-between gap-3 border-t pt-5 sm:flex-row">
+              <Button variant="outline" onClick={retroceder} disabled={preguntaActual === 0}>
+                <ArrowLeft className="h-4 w-4" />
+                Anterior
+              </Button>
               <Button onClick={avanzar}>
                 {preguntaActual === totalPreguntas - 1 ? (
                   <>

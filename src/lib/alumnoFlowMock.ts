@@ -30,10 +30,21 @@ export interface FastTrackItemMock {
   explicacion: string;
 }
 
+export interface ReporteCursoAlumno {
+  apellido: string;
+  nombre: string;
+  puntajeObtenido: number;
+  aprobado: boolean;
+}
+
 export const evaluacionAlumnoMock = {
   token: "demo-4b-matematica",
+  escuela: "E.E.S. Nro. 14 Mariano Moreno",
   alumno: "Mateo Garcia",
+  titulo: "Funciones lineales y modelizacion",
   materia: "Matematica",
+  curso: "4to",
+  division: "B",
   docente: "Marina Fernandez",
   fecha: "18/05/2026",
   duracion: 45,
@@ -247,6 +258,14 @@ export const alumnosConectadosMock = [
   { apellido: "Garcia", nombre: "Mateo", email: "mateo.garcia@estudiante.edu.ar", estado: "Evaluacion formal", version: "IA-017" },
   { apellido: "Molina", nombre: "Sofia", email: "sofia.molina@estudiante.edu.ar", estado: "Resultado disponible", version: "IA-011" },
   { apellido: "Pereyra", nombre: "Tomas", email: "tomas.pereyra@estudiante.edu.ar", estado: "Link recibido", version: "Pendiente" },
+].sort((a, b) => `${a.apellido} ${a.nombre}`.localeCompare(`${b.apellido} ${b.nombre}`));
+
+export const reporteFinalCursoMock: ReporteCursoAlumno[] = [
+  { apellido: "Alvarez", nombre: "Julia", puntajeObtenido: 78, aprobado: true },
+  { apellido: "Garcia", nombre: "Mateo", puntajeObtenido: 85, aprobado: true },
+  { apellido: "Molina", nombre: "Sofia", puntajeObtenido: 92, aprobado: true },
+  { apellido: "Pereyra", nombre: "Tomas", puntajeObtenido: 58, aprobado: false },
+  { apellido: "Rodriguez", nombre: "Lucia", puntajeObtenido: 88, aprobado: true },
 ].sort((a, b) => `${a.apellido} ${a.nombre}`.localeCompare(`${b.apellido} ${b.nombre}`));
 
 export const tokenDemo = evaluacionAlumnoMock.token;
