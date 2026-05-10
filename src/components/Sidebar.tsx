@@ -102,6 +102,15 @@ export function Sidebar({ open, onClose }: SidebarProps) {
               </p>
             </div>
           </div>
+
+          <div className="border-t px-4 py-3 bg-gradient-to-t from-primary/[0.04] to-transparent">
+            <p className="text-[10px] leading-tight text-muted-foreground/70 text-center italic tracking-wide">
+              Sistema de Evaluación diseñado por el Profesor Ricardo Damián CASTRO
+              <span className="block mt-0.5 not-italic">
+                Docente — San Juan, República Argentina
+              </span>
+            </p>
+          </div>
         </div>
       </aside>
     </>
