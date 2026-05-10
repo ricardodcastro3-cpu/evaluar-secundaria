@@ -22,7 +22,7 @@ function ProtectedRoute({
 
   if (!isAuthenticated) return <Navigate to="/login" replace />
   if (rol && usuario?.rol !== rol) {
-    return <Navigate to={usuario?.rol === "docente" ? "/docente" : "/alumno"} replace />
+    return <Navigate to={usuario?.rol === "docente" ? "/dashboard" : "/alumno"} replace />
   }
 
   return <>{children}</>
@@ -44,7 +44,7 @@ export default function App() {
           >
             {/* Rutas Docente */}
             <Route
-              path="/docente"
+              path="/dashboard"
               element={
                 <ProtectedRoute rol="docente">
                   <DashboardDocente />
@@ -52,7 +52,7 @@ export default function App() {
               }
             />
             <Route
-              path="/docente/configurar"
+              path="/nueva-evaluacion"
               element={
                 <ProtectedRoute rol="docente">
                   <ConfigurarEvaluacion />
@@ -111,6 +111,8 @@ export default function App() {
             />
           </Route>
 
+          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="/docente" element={<Navigate to="/dashboard" replace />} />
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </TooltipProvider>
