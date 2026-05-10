@@ -105,11 +105,11 @@ export function EvaluacionFormal() {
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <div className="flex items-center gap-3">
-        <div className="rounded-lg bg-primary/10 p-2">
-          <BookOpen className="h-5 w-5 text-primary" />
+        <div className="rounded-xl bg-[#7C3AED]/12 ring-1 ring-[#7C3AED]/15 p-2">
+          <BookOpen className="h-5 w-5 text-[#7C3AED]" strokeWidth={2.25} />
         </div>
         <div className="flex-1">
-          <h2 className="text-lg font-bold">
+          <h2 className="font-heading text-lg font-bold text-[#0f172a] dark:text-foreground">
             Parcial de Lengua - Análisis Sintáctico
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -133,12 +133,12 @@ export function EvaluacionFormal() {
             key={p.id}
             onClick={() => setPreguntaActual(i)}
             className={cn(
-              "h-9 w-9 rounded-lg text-sm font-medium transition-colors",
+              "h-9 w-9 rounded-xl text-sm font-semibold transition-all",
               i === preguntaActual
-                ? "bg-primary text-primary-foreground"
+                ? "bg-gradient-to-br from-[#7C3AED] to-[#2563EB] text-white shadow-md shadow-[#7C3AED]/30"
                 : respuestas[p.id]
-                  ? "bg-primary/20 text-primary"
-                  : "bg-muted text-muted-foreground hover:bg-accent",
+                  ? "bg-[#7C3AED]/15 text-[#6d28d9] dark:text-[#C4B5FD] ring-1 ring-[#7C3AED]/20"
+                  : "bg-muted text-muted-foreground hover:bg-[#7C3AED]/8",
             )}
           >
             {i + 1}
@@ -176,10 +176,10 @@ export function EvaluacionFormal() {
                   key={opcion.id}
                   onClick={() => handleSeleccion(opcion.id)}
                   className={cn(
-                    "w-full text-left rounded-lg border-2 p-4 transition-all",
+                    "w-full text-left rounded-xl border-2 p-4 transition-all",
                     respuestas[pregunta.id] === opcion.id
-                      ? "border-primary bg-primary/5"
-                      : "border-border hover:border-primary/40 hover:bg-accent/50",
+                      ? "border-[#7C3AED] bg-gradient-to-r from-[#7C3AED]/8 to-[#2563EB]/10 shadow-sm"
+                      : "border-[#E5E7EB] hover:border-[#7C3AED]/45 hover:bg-[#7C3AED]/[0.04] dark:border-border",
                   )}
                 >
                   <span className="text-sm font-medium">{opcion.texto}</span>

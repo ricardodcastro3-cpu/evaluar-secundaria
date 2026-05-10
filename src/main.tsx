@@ -1,10 +1,33 @@
 import { StrictMode } from "react"
 import { createRoot } from "react-dom/client"
-import "./index.css"
+import "./globals.css"
 import App from "./App.tsx"
+import { exchangeOAuthCodeIfPresent, isSupabaseConfigured, supabase } from "@/lib/supabase"
+import { useAuthStore } from "@/store/authStore"
 
-createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+async function bootstrapAuth() {
+  await exchangeOAuthCodeIfPresent()
+  await useAuthStore.getState().checkSession()
+
+  if (isSupabaseConfigured() && supabase) {
+    supabase.auth.onAuthStateChange((event) => {
+      if (
+        event === "INITIAL_SESSION" ||
+        event === "SIGNED_IN" ||
+        event === "SIGNED_OUT"
+      ) {
+        void useAuthStore.getState().checkSession()
+      }
+    })
+  }
+}
+
+bootstrapAuth()
+  .catch((err) => console.error("[auth] bootstrap failed:", err))
+  .finally(() => {
+    createRoot(document.getElementById("root")!).render(
+      <StrictMode>
+        <App />
+      </StrictMode>,
+    )
+  })

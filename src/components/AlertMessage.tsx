@@ -24,27 +24,27 @@ const alertConfig: Record<
 > = {
   info: {
     icon: Info,
-    bg: "bg-blue-50 dark:bg-blue-950/30",
-    border: "border-blue-200 dark:border-blue-800",
-    text: "text-blue-800 dark:text-blue-200",
+    bg: "bg-violet-50 dark:bg-violet-950/35",
+    border: "border-violet-200 dark:border-violet-500/30",
+    text: "text-violet-900 dark:text-violet-100",
   },
   success: {
     icon: CheckCircle2,
-    bg: "bg-emerald-50 dark:bg-emerald-950/30",
-    border: "border-emerald-200 dark:border-emerald-800",
-    text: "text-emerald-800 dark:text-emerald-200",
+    bg: "bg-emerald-50 dark:bg-emerald-950/35",
+    border: "border-emerald-200 dark:border-emerald-500/25",
+    text: "text-emerald-900 dark:text-emerald-100",
   },
   warning: {
     icon: AlertTriangle,
-    bg: "bg-amber-50 dark:bg-amber-950/30",
-    border: "border-amber-200 dark:border-amber-800",
-    text: "text-amber-800 dark:text-amber-200",
+    bg: "bg-amber-50 dark:bg-amber-950/35",
+    border: "border-amber-200 dark:border-amber-500/25",
+    text: "text-amber-950 dark:text-amber-100",
   },
   error: {
     icon: AlertCircle,
-    bg: "bg-red-50 dark:bg-red-950/30",
-    border: "border-red-200 dark:border-red-800",
-    text: "text-red-800 dark:text-red-200",
+    bg: "bg-red-50 dark:bg-red-950/35",
+    border: "border-red-200 dark:border-red-500/25",
+    text: "text-red-900 dark:text-red-100",
   },
 }
 
@@ -64,24 +64,25 @@ export function AlertMessage({
   return (
     <div
       className={cn(
-        "flex items-start gap-3 rounded-lg border p-4",
+        "flex items-start gap-3 rounded-xl border p-4 shadow-sm",
         config.bg,
         config.border,
         className,
       )}
       role="alert"
     >
-      <Icon className={cn("mt-0.5 h-5 w-5 shrink-0", config.text)} />
+      <Icon className={cn("mt-0.5 h-5 w-5 shrink-0", config.text)} strokeWidth={2.25} />
       <div className="flex-1">
         {titulo && (
-          <p className={cn("font-semibold text-sm", config.text)}>{titulo}</p>
+          <p className={cn("font-heading font-bold text-sm", config.text)}>{titulo}</p>
         )}
         <p className={cn("text-sm", config.text)}>{mensaje}</p>
       </div>
       {dismissible && (
         <button
+          type="button"
           onClick={() => setVisible(false)}
-          className={cn("shrink-0 rounded-md p-1 hover:opacity-70", config.text)}
+          className={cn("shrink-0 rounded-lg p-1 hover:opacity-70", config.text)}
         >
           <X className="h-4 w-4" />
         </button>

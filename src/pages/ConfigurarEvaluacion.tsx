@@ -162,7 +162,7 @@ Ingresá al siguiente link para practicar con el Fast Track antes de rendir la e
 
   const getFileIcon = (tipo: string) => {
     if (tipo === "PDF") return <FileText className="h-5 w-5 text-red-500" />
-    if (tipo === "DOCX" || tipo === "DOC") return <File className="h-5 w-5 text-blue-500" />
+    if (tipo === "DOCX" || tipo === "DOC") return <File className="h-5 w-5 text-[#2563EB]" />
     if (tipo === "XLSX" || tipo === "XLS") return <FileSpreadsheet className="h-5 w-5 text-emerald-500" />
     return <File className="h-5 w-5 text-muted-foreground" />
   }
@@ -179,7 +179,7 @@ Ingresá al siguiente link para practicar con el Fast Track antes de rendir la e
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <div>
-          <h2 className="text-2xl font-bold tracking-tight">Nueva Evaluación</h2>
+          <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground">Nueva Evaluación</h2>
           <p className="text-muted-foreground">Configurá tu evaluación y generá el link para los alumnos</p>
         </div>
       </div>
@@ -190,33 +190,44 @@ Ingresá al siguiente link para practicar con el Fast Track antes de rendir la e
             <div className="flex flex-col items-center gap-1.5">
               <div
                 className={cn(
-                  "flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold transition-all",
+                  "flex h-11 w-11 items-center justify-center rounded-full text-sm font-bold transition-all duration-300",
                   paso > step.num
-                    ? "bg-primary text-primary-foreground"
+                    ? "bg-gradient-to-br from-[#10B981] to-emerald-600 text-white shadow-md shadow-emerald-500/30"
                     : paso === step.num
-                      ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30 scale-110"
+                      ? "bg-gradient-to-br from-[#7C3AED] to-[#2563EB] text-white shadow-lg shadow-[rgba(124,58,237,0.35)] scale-110 ring-4 ring-[#F59E0B]/30"
                       : "bg-muted text-muted-foreground",
                 )}
               >
-                {paso > step.num ? <Check className="h-5 w-5" /> : step.num}
+                {paso > step.num ? <Check className="h-5 w-5" strokeWidth={2.5} /> : step.num}
               </div>
-              <span className={cn(
-                "text-xs font-medium whitespace-nowrap",
-                paso >= step.num ? "text-primary" : "text-muted-foreground",
-              )}>
+              <span
+                className={cn(
+                  "text-xs font-semibold whitespace-nowrap transition-colors",
+                  paso > step.num
+                    ? "text-emerald-600 dark:text-emerald-400"
+                    : paso === step.num
+                      ? "text-[#7C3AED] dark:text-primary"
+                      : "text-muted-foreground",
+                )}
+              >
                 {step.label}
               </span>
             </div>
             {i < steps.length - 1 && (
-              <div className={cn(
-                "h-0.5 w-16 sm:w-24 mx-2 mt-[-1.25rem] rounded-full transition-colors",
-                paso > step.num ? "bg-primary" : "bg-muted",
-              )} />
+              <div
+                className={cn(
+                  "h-1 w-16 sm:w-24 mx-2 mt-[-1.25rem] rounded-full transition-all duration-300",
+                  paso > step.num
+                    ? "bg-gradient-to-r from-[#10B981] via-[#7C3AED] to-[#2563EB]"
+                    : "bg-muted",
+                )}
+              />
             )}
           </div>
         ))}
       </div>
 
+      <div key={paso} className="page-enter space-y-6">
       {paso === 1 && (
         <Card>
           <CardHeader>
@@ -437,7 +448,7 @@ Ingresá al siguiente link para practicar con el Fast Track antes de rendir la e
                       </p>
                     </div>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <Loader2 className="h-4 w-4 animate-spin spinner-brand" />
                       Esto puede tardar unos segundos
                     </div>
                   </div>
@@ -453,7 +464,7 @@ Ingresá al siguiente link para practicar con el Fast Track antes de rendir la e
                         Cada alumno recibirá una evaluación diferente.
                       </p>
                     </div>
-                    <Button onClick={handleGenerar} size="lg" className="gap-2 shadow-lg shadow-primary/25 mt-2">
+                    <Button onClick={handleGenerar} size="lg" className="gap-2 mt-2">
                       <Sparkles className="h-5 w-5" />
                       Generar Evaluación con IA
                     </Button>
@@ -520,11 +531,11 @@ Ingresá al siguiente link para practicar con el Fast Track antes de rendir la e
               </Card>
 
               {/* Mensaje listo para Classroom */}
-              <Card className="border-2 border-blue-200 dark:border-blue-800">
+              <Card className="border-2 border-[#7C3AED]/25 dark:border-[#a78bfa]/35">
                 <CardHeader>
                   <div className="flex items-center gap-3">
-                    <div className="rounded-lg bg-blue-100 dark:bg-blue-900/50 p-2">
-                      <svg viewBox="0 0 24 24" className="h-6 w-6 text-blue-600 dark:text-blue-400" fill="currentColor">
+                    <div className="rounded-xl bg-gradient-to-br from-[#7C3AED]/15 to-[#2563EB]/15 dark:from-[#7C3AED]/30 dark:to-[#2563EB]/25 p-2 ring-1 ring-[#7C3AED]/20">
+                      <svg viewBox="0 0 24 24" className="h-6 w-6 text-[#7C3AED] dark:text-[#A78BFA]" fill="currentColor">
                         <path d="M1.637 1.637C.732 1.637 0 2.369 0 3.273v17.454c0 .904.732 1.636 1.637 1.636h20.726c.905 0 1.637-.732 1.637-1.636V3.273c0-.904-.732-1.636-1.637-1.636H1.637zM12 11.182a2.182 2.182 0 100-4.364 2.182 2.182 0 000 4.364zm-4.364 4.909c0-1.636 2.91-2.727 4.364-2.727s4.364 1.09 4.364 2.727v.545H7.636v-.545z" />
                       </svg>
                     </div>
@@ -564,12 +575,12 @@ Ingresá al siguiente link para practicar con el Fast Track antes de rendir la e
               </Card>
 
               {/* Info */}
-              <div className="rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 p-4">
+              <div className="rounded-xl bg-gradient-to-r from-[#7C3AED]/8 to-[#2563EB]/10 dark:from-[#7C3AED]/20 dark:to-[#2563EB]/15 border border-[#7C3AED]/18 dark:border-violet-500/25 p-4">
                 <div className="flex items-start gap-3">
-                  <Zap className="h-5 w-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
-                  <div className="text-sm text-emerald-800 dark:text-emerald-200 space-y-1">
-                    <p className="font-semibold">¿Qué van a ver los alumnos?</p>
-                    <ul className="list-disc list-inside space-y-0.5 text-emerald-700 dark:text-emerald-300">
+                  <Zap className="h-5 w-5 text-[#7C3AED] dark:text-[#C4B5FD] shrink-0 mt-0.5" strokeWidth={2.25} />
+                  <div className="text-sm text-[#0f172a] dark:text-foreground space-y-1">
+                    <p className="font-heading font-bold">¿Qué van a ver los alumnos?</p>
+                    <ul className="list-disc list-inside space-y-0.5 text-muted-foreground">
                       <li>Pantalla de bienvenida con los datos de la evaluación</li>
                       <li>Pueden practicar con el <strong>Fast Track</strong> las veces que quieran</li>
                       <li>Cuando estén listos, inician la <strong>evaluación formal</strong> (una sola oportunidad)</li>
@@ -592,6 +603,7 @@ Ingresá al siguiente link para practicar con el Fast Track antes de rendir la e
           )}
         </div>
       )}
+      </div>
 
       {!(paso === 2 && generado) && (
         <div className="flex items-center justify-between pt-2">
@@ -609,8 +621,12 @@ Ingresá al siguiente link para practicar con el Fast Track antes de rendir la e
               <div
                 key={s.num}
                 className={cn(
-                  "h-2 rounded-full transition-all",
-                  s.num === paso ? "w-6 bg-primary" : "w-2 bg-muted",
+                  "h-2 rounded-full transition-all duration-300",
+                  s.num === paso
+                    ? "w-8 bg-gradient-to-r from-[#7C3AED] to-[#2563EB] shadow-sm shadow-[rgba(124,58,237,0.25)]"
+                    : paso > s.num
+                      ? "w-2 bg-[#10B981]"
+                      : "w-2 bg-muted",
                 )}
               />
             ))}

@@ -1,8 +1,11 @@
-import { useEffect } from "react"
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { Layout } from "@/components/Layout"
 import { Login } from "@/pages/Login"
+import { AlumnoLogin } from "@/pages/AlumnoLogin"
+import { PendingDocente } from "@/pages/PendingDocente"
+import { RejectedDocente } from "@/pages/RejectedDocente"
+import { AdminDocentes } from "@/pages/AdminDocentes"
 import { DashboardDocente } from "@/pages/DashboardDocente"
 import { ConfigurarEvaluacion } from "@/pages/ConfigurarEvaluacion"
 import { DashboardAlumno } from "@/pages/DashboardAlumno"
@@ -17,7 +20,7 @@ import { useAuthStore } from "@/store/authStore"
 import { LoadingSpinner } from "@/components/LoadingSpinner"
 
 function DocenteRoute({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, isDocente, loading } = useAuthStore()
+  const { isAuthenticated, isDocente, isAdmin, loading, docenteSolicitud } = useAuthStore()
 
   if (loading) {
     return (
@@ -27,7 +30,15 @@ function DocenteRoute({ children }: { children: React.ReactNode }) {
     )
   }
   if (!isAuthenticated) return <Navigate to="/login" replace />
-  if (!isDocente) return <Navigate to="/alumno" replace />
+  if (!isDocente && !isAdmin) {
+    if (docenteSolicitud?.estado === "pendiente") {
+      return <Navigate to="/docente/pendiente" replace />
+    }
+    if (docenteSolicitud?.estado === "rechazado") {
+      return <Navigate to="/docente/rechazado" replace />
+    }
+    return <Navigate to="/alumno" replace />
+  }
 
   return <>{children}</>
 }
@@ -48,15 +59,13 @@ function AuthRoute({ children }: { children: React.ReactNode }) {
 }
 
 function AppRoutes() {
-  const { checkSession } = useAuthStore()
-
-  useEffect(() => {
-    checkSession()
-  }, [checkSession])
-
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
+      <Route path="/alumno/login" element={<AlumnoLogin />} />
+      <Route path="/docente/pendiente" element={<PendingDocente />} />
+      <Route path="/docente/rechazado" element={<RejectedDocente />} />
+      <Route path="/admin/docentes" element={<AdminDocentes />} />
 
       <Route
         element={
@@ -65,7 +74,6 @@ function AppRoutes() {
           </AuthRoute>
         }
       >
-        {/* Rutas Docente */}
         <Route
           path="/dashboard"
           element={
@@ -91,14 +99,12 @@ function AppRoutes() {
           }
         />
 
-        {/* Rutas Alumno (requieren sesión, cualquier rol) */}
         <Route path="/alumno" element={<DashboardAlumno />} />
         <Route path="/alumno/fasttrack" element={<FastTrack />} />
         <Route path="/alumno/evaluacion" element={<EvaluacionFormal />} />
         <Route path="/alumno/resultado/:id" element={<Resultado />} />
       </Route>
 
-      {/* Rutas públicas del flujo alumno por token */}
       <Route path="/eval/:token" element={<BienvenidaAlumno />} />
       <Route path="/fast-track/:token" element={<FastTrackAlumno />} />
       <Route path="/evaluacion/:token" element={<EvaluacionFormalAlumno />} />

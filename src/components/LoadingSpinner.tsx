@@ -25,7 +25,9 @@ export function LoadingSpinner({
         className,
       )}
     >
-      <Loader2 className={cn("animate-spin text-primary", sizes[size])} />
+      <Loader2
+        className={cn("animate-spin spinner-brand text-[#7C3AED]", sizes[size])}
+      />
       {texto && (
         <p className="text-sm text-muted-foreground animate-pulse">{texto}</p>
       )}

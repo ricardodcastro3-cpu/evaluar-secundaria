@@ -1,4 +1,5 @@
-import { Moon, Sun, LogOut, Menu, GraduationCap } from "lucide-react"
+import { Link, useNavigate } from "react-router-dom"
+import { Moon, Sun, LogOut, Menu, GraduationCap, Shield } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -10,7 +11,6 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { useTheme } from "@/hooks/useTheme"
 import { useAuthStore } from "@/store/authStore"
-import { useNavigate } from "react-router-dom"
 
 interface HeaderProps {
   onToggleSidebar?: () => void
@@ -18,7 +18,7 @@ interface HeaderProps {
 
 export function Header({ onToggleSidebar }: HeaderProps) {
   const { theme, toggleTheme } = useTheme()
-  const { user, signOut } = useAuthStore()
+  const { user, signOut, isAdmin } = useAuthStore()
   const navigate = useNavigate()
 
   const handleLogout = async () => {
@@ -31,14 +31,14 @@ export function Header({ onToggleSidebar }: HeaderProps) {
     : "?"
 
   return (
-    <header className="sticky top-0 z-40">
-      <div className="bg-[#1A237E] dark:bg-[#0F172A] text-white">
+    <header className="sticky top-0 z-40 shadow-[0_4px_28px_-4px_rgba(124,58,237,0.38)]">
+      <div className="app-gradient-header text-white">
         <div className="flex h-16 items-center gap-4 px-4 md:px-6">
           {onToggleSidebar && (
             <Button
               variant="ghost"
               size="icon"
-              className="md:hidden text-white/80 hover:text-white hover:bg-white/10"
+              className="md:hidden rounded-xl text-white/90 hover:text-white hover:bg-white/15 border-0 shadow-none hover:!translate-y-0"
               onClick={onToggleSidebar}
             >
               <Menu className="h-5 w-5" />
@@ -46,23 +46,33 @@ export function Header({ onToggleSidebar }: HeaderProps) {
           )}
 
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/15 backdrop-blur-sm">
-              <GraduationCap className="h-5 w-5 text-white" />
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-amber-300/45 bg-white/18 backdrop-blur-md ring-1 ring-white/30 shadow-inner">
+              <GraduationCap className="h-6 w-6 text-white" strokeWidth={2.25} />
             </div>
             <div className="hidden sm:block">
-              <h1 className="text-base font-bold tracking-wide font-heading uppercase">
-                EVALUACIONES <span className="text-[#4DD0E1]">SAN JUAN</span>
+              <h1 className="font-heading text-[0.95rem] font-bold tracking-tight text-white uppercase leading-tight">
+                EVALUACIONES SAN JUAN
               </h1>
             </div>
           </div>
 
           <div className="flex-1" />
 
+          {isAdmin && (
+            <Link
+              to="/admin/docentes"
+              className="hidden sm:inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-white/95 hover:bg-white/15 transition-colors"
+            >
+              <Shield className="h-4 w-4" />
+              Gestión docentes
+            </Link>
+          )}
+
           <Button
             variant="ghost"
             size="icon"
             onClick={toggleTheme}
-            className="rounded-full text-white/70 hover:text-white hover:bg-white/10"
+            className="rounded-xl text-white/85 hover:text-white hover:bg-white/15 border-0 shadow-none hover:!translate-y-0"
           >
             {theme === "light" ? (
               <Moon className="h-5 w-5" />
@@ -74,18 +84,18 @@ export function Header({ onToggleSidebar }: HeaderProps) {
           {user && (
             <DropdownMenu>
               <DropdownMenuTrigger
-                className="relative flex h-9 w-9 items-center justify-center rounded-full hover:bg-white/10 transition-colors"
+                className="relative flex h-9 w-9 items-center justify-center rounded-full ring-2 ring-white/30 hover:ring-white/50 transition-all"
               >
                 <Avatar className="h-9 w-9">
-                  <AvatarFallback className="bg-[#0097A7] text-white text-sm font-semibold">
+                  <AvatarFallback className="bg-gradient-to-br from-amber-300 to-violet-600 text-white text-sm font-bold">
                     {initials}
                   </AvatarFallback>
                 </Avatar>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuContent align="end" className="w-56 rounded-xl shadow-[0_8px_32px_-8px_rgba(124,58,237,0.22)]">
                 <div className="flex items-center gap-2 p-2">
                   <Avatar className="h-8 w-8">
-                    <AvatarFallback className="bg-[#0097A7] text-white text-xs">
+                    <AvatarFallback className="bg-gradient-to-br from-amber-300 to-violet-600 text-white text-xs font-bold">
                       {initials}
                     </AvatarFallback>
                   </Avatar>
@@ -108,8 +118,7 @@ export function Header({ onToggleSidebar }: HeaderProps) {
           )}
         </div>
       </div>
-      {/* Thin teal accent line */}
-      <div className="h-[3px] bg-gradient-to-r from-[#0097A7] via-[#00ACC1] to-[#1A237E]" />
+      <div className="h-0.5 bg-gradient-to-r from-white/50 via-white/90 to-white/50 opacity-90" />
     </header>
   )
 }

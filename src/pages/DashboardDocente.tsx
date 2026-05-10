@@ -165,15 +165,34 @@ const alumnosMock: AlumnoRow[] = [
 ]
 
 const estadoConfig: Record<string, { label: string; color: string; bg: string }> = {
-  borrador: { label: "Borrador", color: "text-gray-600 dark:text-gray-400", bg: "bg-gray-100 dark:bg-gray-800" },
-  configurada: { label: "Configurada", color: "text-blue-600 dark:text-blue-400", bg: "bg-blue-50 dark:bg-blue-900/30" },
-  en_curso: { label: "Activa", color: "text-amber-600 dark:text-amber-400", bg: "bg-amber-50 dark:bg-amber-900/30" },
-  finalizada: { label: "Finalizada", color: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-50 dark:bg-emerald-900/30" },
+  borrador: {
+    label: "Borrador",
+    color: "text-slate-700 dark:text-slate-200",
+    bg: "bg-slate-100 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-600",
+  },
+  configurada: {
+    label: "Configurada",
+    color: "text-violet-800 dark:text-violet-200",
+    bg: "bg-violet-100 dark:bg-violet-950/50 border border-violet-200/80 dark:border-violet-500/30",
+  },
+  en_curso: {
+    label: "Activa",
+    color: "text-amber-900 dark:text-amber-100",
+    bg: "bg-amber-100 dark:bg-amber-950/40 border border-amber-200/90 dark:border-amber-500/25",
+  },
+  finalizada: {
+    label: "Finalizada",
+    color: "text-emerald-900 dark:text-emerald-100",
+    bg: "bg-emerald-100 dark:bg-emerald-950/40 border border-emerald-200/90 dark:border-emerald-500/25",
+  },
 }
 
-const estadoAlumnoConfig: Record<string, { label: string; variant: "default" | "secondary" | "outline" | "destructive" }> = {
-  completado: { label: "Completado", variant: "default" },
-  en_curso: { label: "En curso", variant: "secondary" },
+const estadoAlumnoConfig: Record<
+  string,
+  { label: string; variant: "success" | "warning" | "outline" | "destructive" }
+> = {
+  completado: { label: "Completado", variant: "success" },
+  en_curso: { label: "En curso", variant: "warning" },
   pendiente: { label: "Pendiente", variant: "outline" },
   no_iniciado: { label: "No iniciado", variant: "destructive" },
 }
@@ -268,8 +287,8 @@ function ReportesTab() {
               <span className="font-medium">E.E.S. N° 1 - San Martín</span>
             </div>
           </div>
-          <div className="flex items-center gap-4 pt-2 border-t text-sm">
-            <Badge variant="default" className="bg-emerald-600">
+          <div className="flex items-center gap-4 pt-2 border-t border-border text-sm">
+            <Badge variant="success">
               {totalAprobados} aprobados
             </Badge>
             <Badge variant="destructive">
@@ -290,25 +309,25 @@ function ReportesTab() {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="rounded-lg border overflow-hidden">
+          <div className="rounded-xl border border-border overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="table-zebra w-full text-sm">
                 <thead>
-                  <tr className="border-b bg-muted/50">
-                    <th className="text-center font-medium text-muted-foreground px-4 py-3 w-20">N° DE ORDEN</th>
-                    <th className="text-left font-medium text-muted-foreground px-4 py-3">APELLIDO Y NOMBRE</th>
-                    <th className="text-center font-medium text-muted-foreground px-4 py-3">PUNTAJE OBTENIDO</th>
-                    <th className="text-center font-medium text-muted-foreground px-4 py-3">APROBADO / REPROBADO</th>
+                  <tr className="border-b border-border table-head-gradient">
+                    <th className="text-center font-heading font-bold text-[#0f172a] dark:text-foreground px-4 py-3 w-20">N° DE ORDEN</th>
+                    <th className="text-left font-heading font-bold text-[#0f172a] dark:text-foreground px-4 py-3">APELLIDO Y NOMBRE</th>
+                    <th className="text-center font-heading font-bold text-[#0f172a] dark:text-foreground px-4 py-3">PUNTAJE OBTENIDO</th>
+                    <th className="text-center font-heading font-bold text-[#0f172a] dark:text-foreground px-4 py-3">APROBADO / REPROBADO</th>
                   </tr>
                 </thead>
                 <tbody>
                   {alumnosReporte.map((a) => (
-                    <tr key={a.orden} className="border-b last:border-0 hover:bg-accent/50 transition-colors">
+                    <tr key={a.orden} className="border-b border-border/80 last:border-0 hover:bg-[#7C3AED]/[0.04] transition-colors">
                       <td className="px-4 py-3 text-center font-mono">{a.orden}</td>
                       <td className="px-4 py-3 font-medium">{a.nombreCompleto}</td>
                       <td className="px-4 py-3 text-center font-mono">{a.puntaje}</td>
                       <td className="px-4 py-3 text-center">
-                        <Badge variant={a.resultado === "APROBADO" ? "default" : "destructive"}>
+                        <Badge variant={a.resultado === "APROBADO" ? "success" : "destructive"}>
                           {a.resultado}
                         </Badge>
                       </td>
@@ -351,10 +370,10 @@ export function DashboardDocente() {
     <div className="space-y-8">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight">Mis Evaluaciones</h2>
+          <h2 className="font-heading text-2xl font-bold tracking-tight text-[#0f172a] dark:text-foreground">Mis Evaluaciones</h2>
           <p className="text-muted-foreground">Gestioná y seguí el progreso de tus evaluaciones</p>
         </div>
-        <Button onClick={() => navigate("/nueva-evaluacion")} size="lg" className="gap-2 shadow-lg shadow-primary/25">
+        <Button onClick={() => navigate("/nueva-evaluacion")} size="lg" className="gap-2">
           <Plus className="h-5 w-5" />
           Nueva Evaluación
         </Button>
@@ -363,19 +382,47 @@ export function DashboardDocente() {
       {/* Stats */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[
-          { label: "Total Evaluaciones", value: evaluacionesMock.length, icon: FileText, color: "text-primary", bg: "bg-primary/10" },
-          { label: "Activas", value: totalActivas, icon: Clock, color: "text-amber-600 dark:text-amber-400", bg: "bg-amber-100 dark:bg-amber-900/30" },
-          { label: "Finalizadas", value: totalFinalizadas, icon: CheckCircle2, color: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-100 dark:bg-emerald-900/30" },
-          { label: "Alumnos Totales", value: totalAlumnos, icon: Users, color: "text-violet-600 dark:text-violet-400", bg: "bg-violet-100 dark:bg-violet-900/30" },
+          {
+            label: "Total Evaluaciones",
+            value: evaluacionesMock.length,
+            icon: FileText,
+            color: "text-[#7C3AED]",
+            bg: "bg-gradient-to-br from-[#7C3AED]/20 via-violet-400/15 to-[#2563EB]/10 ring-1 ring-[#7C3AED]/20",
+          },
+          {
+            label: "Activas",
+            value: totalActivas,
+            icon: Clock,
+            color: "text-amber-600 dark:text-amber-400",
+            bg: "bg-gradient-to-br from-amber-200/80 to-amber-400/25 dark:from-amber-900/50 dark:to-amber-700/20 ring-1 ring-amber-300/50 dark:ring-amber-500/25",
+          },
+          {
+            label: "Finalizadas",
+            value: totalFinalizadas,
+            icon: CheckCircle2,
+            color: "text-emerald-600 dark:text-emerald-400",
+            bg: "bg-gradient-to-br from-emerald-200/70 to-emerald-400/20 dark:from-emerald-900/45 dark:to-emerald-800/15 ring-1 ring-emerald-300/50 dark:ring-emerald-500/25",
+          },
+          {
+            label: "Alumnos Totales",
+            value: totalAlumnos,
+            icon: Users,
+            color: "text-[#2563EB]",
+            bg: "bg-gradient-to-br from-[#2563EB]/18 via-sky-300/15 to-[#7C3AED]/10 ring-1 ring-[#2563EB]/22",
+          },
         ].map((stat) => (
           <Card key={stat.label}>
             <CardContent className="flex items-center gap-4 p-5">
-              <div className={`rounded-xl p-3 ${stat.bg}`}>
-                <stat.icon className={`h-5 w-5 ${stat.color}`} />
+              <div
+                className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl shadow-sm ${stat.bg}`}
+              >
+                <stat.icon className={`h-9 w-9 ${stat.color}`} strokeWidth={2} />
               </div>
-              <div>
-                <p className="text-2xl font-bold">{stat.value}</p>
-                <p className="text-sm text-muted-foreground">{stat.label}</p>
+              <div className="min-w-0">
+                <p className="font-heading text-2xl font-bold text-[#0f172a] dark:text-foreground">
+                  {stat.value}
+                </p>
+                <p className="text-sm font-medium text-muted-foreground">{stat.label}</p>
               </div>
             </CardContent>
           </Card>
@@ -425,23 +472,23 @@ export function DashboardDocente() {
             {evalsFiltradas.map((ev) => {
               const estado = estadoConfig[ev.estado]
               return (
-                <Card key={ev.id} className="group hover:shadow-md transition-all hover:border-primary/30">
+                <Card key={ev.id} className="group hover:shadow-[0_12px_40px_-12px_rgba(124,58,237,0.18)] transition-all hover:ring-[#7C3AED]/20">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-2">
-                        <div className={`rounded-lg p-1.5 ${ev.tipo === "fasttrack" ? "bg-amber-100 dark:bg-amber-900/30" : "bg-primary/10"}`}>
+                        <div className={`rounded-xl p-1.5 ring-1 ${ev.tipo === "fasttrack" ? "bg-amber-100 dark:bg-amber-900/35 ring-amber-200/70" : "bg-[#7C3AED]/10 ring-[#7C3AED]/20"}`}>
                           {ev.tipo === "fasttrack" ? (
-                            <Zap className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                            <Zap className="h-4 w-4 text-amber-600 dark:text-amber-400" strokeWidth={2.25} />
                           ) : (
-                            <BookOpen className="h-4 w-4 text-primary" />
+                            <BookOpen className="h-4 w-4 text-[#7C3AED]" strokeWidth={2.25} />
                           )}
                         </div>
-                        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${estado.color} ${estado.bg}`}>
+                        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-bold ${estado.color} ${estado.bg}`}>
                           {estado.label}
                         </span>
                       </div>
                       <DropdownMenu>
-                        <DropdownMenuTrigger className="rounded-md p-1 opacity-0 group-hover:opacity-100 hover:bg-accent transition-all">
+                        <DropdownMenuTrigger className="rounded-xl p-1.5 opacity-0 group-hover:opacity-100 hover:bg-[#7C3AED]/8 transition-all">
                           <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
@@ -515,26 +562,26 @@ export function DashboardDocente() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="rounded-lg border overflow-hidden">
+              <div className="rounded-xl border border-border overflow-hidden">
                 <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
+                  <table className="table-zebra w-full text-sm">
                     <thead>
-                      <tr className="border-b bg-muted/50">
-                        <th className="text-left font-medium text-muted-foreground px-4 py-3">Alumno</th>
-                        <th className="text-left font-medium text-muted-foreground px-4 py-3">Estado</th>
-                        <th className="text-center font-medium text-muted-foreground px-4 py-3">Intentos FT</th>
-                        <th className="text-center font-medium text-muted-foreground px-4 py-3">Nota</th>
-                        <th className="text-center font-medium text-muted-foreground px-4 py-3">Tiempo</th>
+                      <tr className="border-b border-border table-head-gradient">
+                        <th className="text-left font-heading font-bold text-[#0f172a] dark:text-foreground px-4 py-3">Alumno</th>
+                        <th className="text-left font-heading font-bold text-[#0f172a] dark:text-foreground px-4 py-3">Estado</th>
+                        <th className="text-center font-heading font-bold text-[#0f172a] dark:text-foreground px-4 py-3">Intentos FT</th>
+                        <th className="text-center font-heading font-bold text-[#0f172a] dark:text-foreground px-4 py-3">Nota</th>
+                        <th className="text-center font-heading font-bold text-[#0f172a] dark:text-foreground px-4 py-3">Tiempo</th>
                       </tr>
                     </thead>
                     <tbody>
                       {alumnosFiltrados.map((alumno) => {
                         const estadoAl = estadoAlumnoConfig[alumno.estado]
                         return (
-                          <tr key={alumno.id} className="border-b last:border-0 hover:bg-accent/50 transition-colors">
+                          <tr key={alumno.id} className="border-b border-border/80 last:border-0 hover:bg-[#7C3AED]/[0.04] transition-colors">
                             <td className="px-4 py-3">
                               <div className="flex items-center gap-3">
-                                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold text-xs">
+                                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#7C3AED]/18 to-[#2563EB]/22 text-[#6d28d9] dark:from-[#a78bfa]/25 dark:to-[#2563EB]/25 dark:text-[#C4B5FD] font-bold text-xs ring-1 ring-[#7C3AED]/15">
                                   {alumno.nombre[0]}{alumno.apellido[0]}
                                 </div>
                                 <span className="font-medium">{alumno.apellido}, {alumno.nombre}</span>

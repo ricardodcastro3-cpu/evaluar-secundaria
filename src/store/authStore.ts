@@ -1,6 +1,8 @@
 import { create } from "zustand"
 import { supabase, isSupabaseConfigured } from "@/lib/supabase"
+import { consumeOauthIntent, setOauthIntent } from "@/lib/oauthContext"
 import type { User } from "@supabase/supabase-js"
+import type { SolicitudDocente } from "@/types/docentes"
 
 interface AuthUser {
   id: string
@@ -15,13 +17,20 @@ interface AuthState {
   user: AuthUser | null
   loading: boolean
   isDocente: boolean
+  isAdmin: boolean
   isAuthenticated: boolean
   error: string | null
+  docenteSolicitud: SolicitudDocente | null
+  /** True solo la primera vez que se crea la fila de solicitud en esta sesión. */
+  solicitudJustCreated: boolean
 
   signInWithGoogle: () => Promise<void>
+  signInWithGoogleAsAlumno: () => Promise<void>
   signOut: () => Promise<void>
   checkSession: () => Promise<void>
   clearError: () => void
+  refreshAccessState: () => Promise<void>
+  clearSolicitudJustCreated: () => void
 }
 
 function mapSupabaseUser(user: User): AuthUser {
@@ -41,16 +50,14 @@ function mapSupabaseUser(user: User): AuthUser {
   }
 }
 
-async function resolveRol(user: User): Promise<"docente" | "alumno"> {
-  if (!isSupabaseConfigured() || !supabase) return "docente"
-
-  const { data } = await supabase
-    .from("docentes")
-    .select("id")
-    .eq("email", user.email ?? "")
-    .maybeSingle()
-
-  return data ? "docente" : "alumno"
+function fullNameFromUser(user: User): string {
+  const meta = user.user_metadata ?? {}
+  return (
+    (meta.full_name as string) ||
+    (meta.name as string) ||
+    [meta.given_name, meta.family_name].filter(Boolean).join(" ") ||
+    "Docente"
+  )
 }
 
 const mockDocente: AuthUser = {
@@ -71,37 +78,82 @@ const mockAlumno: AuthUser = {
   avatar_url: undefined,
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
+async function oauthGoogle(
+  redirectPath: string,
+  loadingSetter: (v: boolean) => void,
+  errSetter: (e: string | null) => void,
+) {
+  if (!isSupabaseConfigured() || !supabase) return
+  loadingSetter(true)
+  errSetter(null)
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: `${window.location.origin}${redirectPath}`,
+    },
+  })
+  if (error) {
+    errSetter(error.message)
+    loadingSetter(false)
+  }
+}
+
+export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   loading: true,
   isDocente: false,
+  isAdmin: false,
   isAuthenticated: false,
   error: null,
+  docenteSolicitud: null,
+  solicitudJustCreated: false,
+
+  clearSolicitudJustCreated: () => set({ solicitudJustCreated: false }),
 
   signInWithGoogle: async () => {
+    setOauthIntent("docente")
     if (!isSupabaseConfigured() || !supabase) {
       set({ loading: true, error: null })
       await new Promise((r) => setTimeout(r, 600))
       set({
         user: mockDocente,
         isDocente: true,
+        isAdmin: true,
         isAuthenticated: true,
+        docenteSolicitud: null,
+        solicitudJustCreated: false,
         loading: false,
       })
       return
     }
+    await oauthGoogle(
+      "/login",
+      (v) => set({ loading: v }),
+      (e) => set({ error: e, loading: false }),
+    )
+  },
 
-    set({ loading: true, error: null })
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/login`,
-      },
-    })
-
-    if (error) {
-      set({ error: error.message, loading: false })
+  signInWithGoogleAsAlumno: async () => {
+    setOauthIntent("alumno")
+    if (!isSupabaseConfigured() || !supabase) {
+      set({ loading: true, error: null })
+      await new Promise((r) => setTimeout(r, 600))
+      set({
+        user: mockAlumno,
+        isDocente: false,
+        isAdmin: false,
+        isAuthenticated: true,
+        docenteSolicitud: null,
+        solicitudJustCreated: false,
+        loading: false,
+      })
+      return
     }
+    await oauthGoogle(
+      "/alumno/login",
+      (v) => set({ loading: v }),
+      (e) => set({ error: e, loading: false }),
+    )
   },
 
   signOut: async () => {
@@ -111,10 +163,19 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({
       user: null,
       isDocente: false,
+      isAdmin: false,
       isAuthenticated: false,
       error: null,
+      docenteSolicitud: null,
+      solicitudJustCreated: false,
       loading: false,
     })
+  },
+
+  clearError: () => set({ error: null }),
+
+  refreshAccessState: async () => {
+    await get().checkSession()
   },
 
   checkSession: async () => {
@@ -123,32 +184,164 @@ export const useAuthStore = create<AuthState>((set) => ({
       return
     }
 
-    set({ loading: true })
+    set({ loading: true, error: null })
     const {
       data: { session },
     } = await supabase.auth.getSession()
 
-    if (session?.user) {
-      const rol = await resolveRol(session.user)
-      const mapped = mapSupabaseUser(session.user)
-      mapped.rol = rol
-      set({
-        user: mapped,
-        isDocente: rol === "docente",
-        isAuthenticated: true,
-        loading: false,
-      })
-    } else {
+    if (!session?.user) {
       set({
         user: null,
         isDocente: false,
+        isAdmin: false,
         isAuthenticated: false,
+        docenteSolicitud: null,
+        solicitudJustCreated: false,
         loading: false,
       })
+      return
     }
-  },
 
-  clearError: () => set({ error: null }),
+    const intent = consumeOauthIntent()
+    const mapped = mapSupabaseUser(session.user)
+    const email = (session.user.email ?? "").toLowerCase().trim()
+
+    const { data: isAdminRpc } = await supabase.rpc("is_admin")
+    const isAdmin = Boolean(isAdminRpc)
+
+    const { data: docenteRow } = await supabase
+      .from("docentes")
+      .select("id")
+      .eq("email", email)
+      .maybeSingle()
+
+    const isInDocentes = Boolean(docenteRow)
+
+    if (intent === "alumno" || intent === null) {
+      mapped.rol = isInDocentes ? "docente" : "alumno"
+      let solicitud: SolicitudDocente | null = null
+      if (!isInDocentes && intent === null) {
+        const { data: sol } = await supabase
+          .from("solicitudes_docentes")
+          .select("*")
+          .eq("email", email)
+          .maybeSingle()
+        solicitud = sol as SolicitudDocente | null
+      }
+      set({
+        user: mapped,
+        isDocente: isInDocentes,
+        isAdmin,
+        isAuthenticated: true,
+        docenteSolicitud: solicitud,
+        solicitudJustCreated: false,
+        loading: false,
+      })
+      return
+    }
+
+    // Login explícito como docente (Google desde /login)
+    if (isAdmin) {
+      mapped.rol = "docente"
+      set({
+        user: mapped,
+        isDocente: isInDocentes,
+        isAdmin: true,
+        isAuthenticated: true,
+        docenteSolicitud: null,
+        solicitudJustCreated: false,
+        loading: false,
+      })
+      return
+    }
+
+    if (isInDocentes) {
+      mapped.rol = "docente"
+      set({
+        user: mapped,
+        isDocente: true,
+        isAdmin,
+        isAuthenticated: true,
+        docenteSolicitud: null,
+        solicitudJustCreated: false,
+        loading: false,
+      })
+      return
+    }
+
+    const { data: existingSolRaw } = await supabase
+      .from("solicitudes_docentes")
+      .select("*")
+      .eq("email", email)
+      .maybeSingle()
+
+    let sol = existingSolRaw as SolicitudDocente | null
+
+    if (!sol) {
+      const { data: created, error: rpcErr } = await supabase.rpc(
+        "create_docente_solicitud",
+        { p_nombre: fullNameFromUser(session.user) },
+      )
+      if (rpcErr) {
+        set({
+          user: mapped,
+          isDocente: false,
+          isAdmin,
+          isAuthenticated: true,
+          docenteSolicitud: null,
+          solicitudJustCreated: false,
+          error: rpcErr.message,
+          loading: false,
+        })
+        return
+      }
+      sol = created as unknown as SolicitudDocente
+      set({
+        user: mapped,
+        isDocente: false,
+        isAdmin,
+        isAuthenticated: true,
+        docenteSolicitud: sol,
+        solicitudJustCreated: true,
+        loading: false,
+      })
+      return
+    } else if (sol.estado === "pendiente") {
+      const { error: rpcErr } = await supabase.rpc("create_docente_solicitud", {
+        p_nombre: fullNameFromUser(session.user),
+      })
+      if (rpcErr) {
+        set({
+          user: mapped,
+          isDocente: false,
+          isAdmin,
+          isAuthenticated: true,
+          docenteSolicitud: sol,
+          solicitudJustCreated: false,
+          error: rpcErr.message,
+          loading: false,
+        })
+        return
+      }
+      const { data: refreshed } = await supabase
+        .from("solicitudes_docentes")
+        .select("*")
+        .eq("email", email)
+        .maybeSingle()
+      sol = refreshed as SolicitudDocente | null
+    }
+
+    mapped.rol = "docente"
+    set({
+      user: mapped,
+      isDocente: false,
+      isAdmin,
+      isAuthenticated: true,
+      docenteSolicitud: sol,
+      solicitudJustCreated: false,
+      loading: false,
+    })
+  },
 }))
 
 export { mockDocente, mockAlumno }

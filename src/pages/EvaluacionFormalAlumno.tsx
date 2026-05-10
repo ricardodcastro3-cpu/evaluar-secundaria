@@ -182,7 +182,7 @@ export function EvaluacionFormalAlumno() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950/20">
+    <div className="min-h-screen bg-background dark:bg-background">
       {/* Banner rojo superior */}
       <div className="bg-red-600 dark:bg-red-800 text-white">
         <div className="mx-auto max-w-3xl px-4 py-2.5 flex flex-col items-center gap-1">
@@ -211,12 +211,12 @@ export function EvaluacionFormalAlumno() {
       )}
 
       {/* Sticky header */}
-      <div className="sticky top-0 z-30 bg-background/80 backdrop-blur-sm border-b">
+      <div className="sticky top-0 z-30 bg-background/90 dark:bg-background/85 backdrop-blur-md border-b border-[#E5E7EB] dark:border-border">
         <div className="mx-auto max-w-3xl px-4 py-3 space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="rounded-lg bg-primary/10 p-1.5">
-                <BookOpen className="h-4 w-4 text-primary" />
+              <div className="rounded-xl bg-[#7C3AED]/12 ring-1 ring-[#7C3AED]/15 p-1.5">
+                <BookOpen className="h-4 w-4 text-[#7C3AED]" strokeWidth={2.25} />
               </div>
               <span className="font-semibold text-sm">
                 Parcial de Matemática - Funciones
@@ -250,12 +250,12 @@ export function EvaluacionFormalAlumno() {
               key={p.id}
               onClick={() => setPreguntaActual(i)}
               className={cn(
-                "h-9 w-9 rounded-lg text-sm font-medium transition-colors",
+                "h-9 w-9 rounded-xl text-sm font-semibold transition-all",
                 i === preguntaActual
-                  ? "bg-primary text-primary-foreground shadow-sm"
+                  ? "bg-gradient-to-br from-[#7C3AED] to-[#2563EB] text-white shadow-md shadow-[#7C3AED]/30"
                   : respuestas[p.id]
-                    ? "bg-primary/20 text-primary"
-                    : "bg-muted text-muted-foreground hover:bg-accent",
+                    ? "bg-[#7C3AED]/15 text-[#6d28d9] dark:text-[#C4B5FD] ring-1 ring-[#7C3AED]/20"
+                    : "bg-muted text-muted-foreground hover:bg-[#7C3AED]/8",
               )}
             >
               {i + 1}
@@ -315,15 +315,15 @@ export function EvaluacionFormalAlumno() {
                     className={cn(
                       "w-full text-left rounded-xl border-2 p-4 transition-all flex items-center gap-4",
                       respuestas[pregunta.id] === opcion.id
-                        ? "border-primary bg-primary/5 shadow-sm"
-                        : "border-border hover:border-primary/40 hover:bg-accent/50",
+                        ? "border-[#7C3AED] bg-gradient-to-r from-[#7C3AED]/8 to-[#2563EB]/10 shadow-sm"
+                        : "border-[#E5E7EB] hover:border-[#7C3AED]/45 hover:bg-[#7C3AED]/[0.04] dark:border-border",
                     )}
                   >
                     <div
                       className={cn(
                         "flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 transition-colors",
                         respuestas[pregunta.id] === opcion.id
-                          ? "border-primary bg-primary"
+                          ? "border-[#7C3AED] bg-gradient-to-br from-[#7C3AED] to-[#2563EB]"
                           : "border-muted-foreground/30",
                       )}
                     >

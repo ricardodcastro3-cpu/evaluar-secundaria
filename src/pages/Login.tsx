@@ -29,90 +29,104 @@ function GoogleIcon({ className }: { className?: string }) {
   )
 }
 
+function destinationAfterDocenteLogin() {
+  const s = useAuthStore.getState()
+  const sol = s.docenteSolicitud
+  if (sol?.estado === "pendiente") return "/docente/pendiente"
+  if (sol?.estado === "rechazado") return "/docente/rechazado"
+  if (s.isDocente) return "/dashboard"
+  if (s.isAdmin) return "/admin/docentes"
+  return "/alumno"
+}
+
 export function Login() {
   const navigate = useNavigate()
-  const { signInWithGoogle, checkSession, isAuthenticated, isDocente, loading, error } =
-    useAuthStore()
+  const {
+    signInWithGoogle,
+    isAuthenticated,
+    loading,
+    error,
+    docenteSolicitud,
+    isDocente,
+    isAdmin,
+  } = useAuthStore()
   const { theme, toggleTheme } = useTheme()
 
   useEffect(() => {
-    checkSession()
-  }, [checkSession])
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate(isDocente ? "/dashboard" : "/alumno", { replace: true })
-    }
-  }, [isAuthenticated, isDocente, navigate])
+    if (loading || !isAuthenticated) return
+    navigate(destinationAfterDocenteLogin(), { replace: true })
+  }, [isAuthenticated, loading, navigate, docenteSolicitud, isDocente, isAdmin])
 
   const handleGoogleLogin = async () => {
     await signInWithGoogle()
     const state = useAuthStore.getState()
     if (state.isAuthenticated) {
-      navigate(state.isDocente ? "/dashboard" : "/alumno", { replace: true })
+      navigate(destinationAfterDocenteLogin(), { replace: true })
     }
   }
 
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-[#1A237E] via-[#283593] to-[#0097A7] dark:from-[#0F172A] dark:via-[#1E293B] dark:to-[#0D47A1]" />
+      <div className="absolute inset-0 login-animated-gradient" />
 
-      <div className="absolute inset-0 opacity-[0.07]">
-        <div className="absolute top-20 left-10 h-72 w-72 rounded-full bg-white blur-3xl" />
-        <div className="absolute bottom-20 right-10 h-96 w-96 rounded-full bg-white blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-64 w-64 rounded-full bg-white blur-3xl" />
+      <div className="absolute inset-0 opacity-[0.12] pointer-events-none">
+        <div className="absolute top-16 left-[8%] h-80 w-80 rounded-full bg-white blur-3xl animate-pulse" />
+        <div className="absolute bottom-10 right-[5%] h-96 w-96 rounded-full bg-[#C4B5FD] blur-3xl" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-72 w-72 rounded-full bg-[#2563EB] blur-3xl opacity-60" />
       </div>
 
       <Button
         variant="ghost"
         size="icon"
         onClick={toggleTheme}
-        className="fixed top-4 right-4 rounded-full text-white/70 hover:text-white hover:bg-white/10 z-50"
+        className="fixed top-4 right-4 z-50 rounded-xl text-white/90 hover:text-white hover:bg-white/15 border-0 shadow-none hover:!translate-y-0"
       >
         {theme === "light" ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
       </Button>
 
-      <div className="relative z-10 w-full max-w-md px-4 space-y-8">
+      <div className="relative z-10 w-full max-w-md px-4 space-y-8 page-enter">
         <div className="text-center space-y-6">
-          <div className="inline-flex h-24 w-24 items-center justify-center rounded-3xl bg-white/15 backdrop-blur-sm shadow-2xl shadow-black/10 border border-white/20">
-            <GraduationCap className="h-14 w-14 text-white" />
+          <div className="inline-flex h-24 w-24 items-center justify-center rounded-2xl glass-panel">
+            <GraduationCap className="h-14 w-14 text-white" strokeWidth={2} />
           </div>
 
           <div className="space-y-2">
-            <h1 className="text-4xl font-extrabold tracking-tight text-white">
+            <h1 className="font-heading text-3xl sm:text-4xl font-bold tracking-tight text-white drop-shadow-md">
               EVALUACIONES SAN JUAN
             </h1>
-            <p className="text-sm text-sky-200/80 max-w-xs mx-auto leading-relaxed">
+            <p className="text-sm text-white/85 max-w-xs mx-auto leading-relaxed font-medium">
               Nivel Secundario — Ciclo Básico y Orientado — San Juan, República Argentina
             </p>
           </div>
         </div>
 
-        <div className="rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 p-8 shadow-2xl shadow-black/10">
+        <div className="glass-panel glass-panel-elevated rounded-[20px] p-8 sm:p-9">
           <div className="space-y-6">
             <div className="text-center space-y-1">
-              <h2 className="text-xl font-semibold text-white">
-                Bienvenido/a
+              <h2 className="font-heading text-xl font-bold text-white">
+                Acceso docente
               </h2>
-              <p className="text-sm text-sky-200/80">
-                Ingresá con tu cuenta institucional
+              <p className="text-sm text-white/75">
+                Solo personal docente: ingresá con Google. Si tu correo aún no está autorizado, se enviará una
+                solicitud al administrador.
               </p>
             </div>
 
             {error && (
-              <div className="rounded-lg bg-red-500/20 border border-red-400/30 p-3 text-center">
-                <p className="text-sm text-red-100">{error}</p>
+              <div className="rounded-xl bg-red-500/25 border border-red-400/40 p-3 text-center backdrop-blur-sm">
+                <p className="text-sm text-red-50 font-medium">{error}</p>
               </div>
             )}
 
             <Button
               onClick={handleGoogleLogin}
               disabled={loading}
-              className="w-full h-14 bg-white hover:bg-gray-50 text-gray-700 font-semibold text-base rounded-xl shadow-lg shadow-black/10 transition-all hover:shadow-xl hover:scale-[1.01] active:scale-[0.99] border-0"
+              variant="secondary"
+              className="w-full h-14 bg-white hover:bg-[#F8FAFC] text-slate-900 font-bold text-base rounded-[12px] shadow-[0_20px_50px_-14px_rgba(15,23,42,0.38),0_8px_24px_-8px_rgba(124,58,237,0.18)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_28px_56px_-12px_rgba(15,23,42,0.42),0_12px_28px_-6px_rgba(37,99,235,0.2)] active:translate-y-0 border-0"
             >
               {loading ? (
                 <>
-                  <Loader2 className="mr-3 h-5 w-5 animate-spin" />
+                  <Loader2 className="mr-3 h-5 w-5 animate-spin spinner-brand" />
                   Conectando...
                 </>
               ) : (
@@ -123,31 +137,31 @@ export function Login() {
               )}
             </Button>
 
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-white/20" />
-              </div>
-              <div className="relative flex justify-center text-xs">
-                <span className="bg-transparent px-3 text-sky-200/60">
-                  acceso exclusivo para docentes
-                </span>
-              </div>
+            <div className="rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-left">
+              <p className="text-xs text-white/90 leading-relaxed">
+                <span className="font-subheading text-white">Estudiantes:</span> el acceso no es por esta
+                pantalla. Usan el enlace que su docente publica en el tablón del aula (por ejemplo Google Classroom).
+                Ese enlace los lleva a practicar con <strong className="font-semibold">Fast Track</strong> o a
+                iniciar la <strong className="font-semibold">evaluación formal</strong>, según decidan. Iniciar sesión
+                con Google acá es <span className="font-semibold">solo para docentes</span>, para evitar pedidos de
+                autorización por error.
+              </p>
             </div>
 
-            <p className="text-center text-xs text-sky-200/50 leading-relaxed">
+            <p className="text-center text-xs text-white/60 leading-relaxed">
               Al ingresar aceptás los{" "}
-              <button type="button" className="underline hover:text-white transition-colors">
+              <button type="button" className="underline decoration-white/40 hover:text-white transition-colors font-medium">
                 términos de servicio
               </button>{" "}
               y la{" "}
-              <button type="button" className="underline hover:text-white transition-colors">
+              <button type="button" className="underline decoration-white/40 hover:text-white transition-colors font-medium">
                 política de privacidad
               </button>
             </p>
           </div>
         </div>
 
-        <p className="text-center text-xs text-sky-200/40">
+        <p className="text-center text-xs text-white/45 max-w-sm mx-auto">
           Diseño de propiedad intelectual del Profesor RICARDO DAMIÁN CASTRO — San Juan, República Argentina
         </p>
       </div>

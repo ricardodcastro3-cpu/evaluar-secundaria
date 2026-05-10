@@ -56,7 +56,7 @@ export function DashboardAlumno() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold tracking-tight">
+        <h2 className="font-heading text-2xl font-bold tracking-tight text-[#0f172a] dark:text-foreground">
           ¡Hola, {user?.nombre}!
         </h2>
         <p className="text-muted-foreground">
@@ -67,38 +67,38 @@ export function DashboardAlumno() {
       <div className="grid gap-4 sm:grid-cols-3">
         <Card>
           <CardContent className="flex items-center gap-4 p-5">
-            <div className="rounded-xl bg-amber-100 dark:bg-amber-900/30 p-3">
-              <Clock className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-200/85 to-amber-400/30 shadow-sm ring-1 ring-amber-300/55 dark:from-amber-900/55 dark:to-amber-700/25 dark:ring-amber-500/25">
+              <Clock className="h-9 w-9 text-amber-700 dark:text-amber-300" strokeWidth={2} />
             </div>
-            <div>
-              <p className="text-2xl font-bold">
+            <div className="min-w-0">
+              <p className="font-heading text-2xl font-bold text-[#0f172a] dark:text-foreground">
                 {evaluacionesPendientes.length}
               </p>
-              <p className="text-sm text-muted-foreground">Pendientes</p>
+              <p className="text-sm font-medium text-muted-foreground">Pendientes</p>
             </div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="flex items-center gap-4 p-5">
-            <div className="rounded-xl bg-emerald-100 dark:bg-emerald-900/30 p-3">
-              <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-200/80 to-emerald-400/25 shadow-sm ring-1 ring-emerald-300/55 dark:from-emerald-900/55 dark:to-emerald-800/20 dark:ring-emerald-500/25">
+              <CheckCircle2 className="h-9 w-9 text-emerald-700 dark:text-emerald-300" strokeWidth={2} />
             </div>
-            <div>
-              <p className="text-2xl font-bold">
+            <div className="min-w-0">
+              <p className="font-heading text-2xl font-bold text-[#0f172a] dark:text-foreground">
                 {evaluacionesCompletadas.length}
               </p>
-              <p className="text-sm text-muted-foreground">Completadas</p>
+              <p className="text-sm font-medium text-muted-foreground">Completadas</p>
             </div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="flex items-center gap-4 p-5">
-            <div className="rounded-xl bg-primary/10 p-3">
-              <Trophy className="h-5 w-5 text-primary" />
+            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#7C3AED]/25 via-violet-300/20 to-[#2563EB]/15 shadow-sm ring-1 ring-[#7C3AED]/20">
+              <Trophy className="h-9 w-9 text-[#7C3AED]" strokeWidth={2} />
             </div>
-            <div>
-              <p className="text-2xl font-bold">8.0</p>
-              <p className="text-sm text-muted-foreground">Promedio</p>
+            <div className="min-w-0">
+              <p className="font-heading text-2xl font-bold text-[#0f172a] dark:text-foreground">8.0</p>
+              <p className="text-sm font-medium text-muted-foreground">Promedio</p>
             </div>
           </CardContent>
         </Card>
@@ -107,7 +107,7 @@ export function DashboardAlumno() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Target className="h-5 w-5 text-primary" />
+            <Target className="h-5 w-5 text-[#7C3AED]" strokeWidth={2.25} />
             Evaluaciones Pendientes
           </CardTitle>
           <CardDescription>
@@ -124,15 +124,15 @@ export function DashboardAlumno() {
               {evaluacionesPendientes.map((ev) => (
                 <div
                   key={ev.id}
-                  className="flex flex-col sm:flex-row sm:items-center gap-4 rounded-lg border p-4"
+                  className="flex flex-col sm:flex-row sm:items-center gap-4 rounded-xl border border-[#E5E7EB] dark:border-border bg-white/60 dark:bg-card/50 p-4 shadow-sm"
                 >
                   <div
-                    className={`rounded-lg p-2 self-start ${ev.tipo === "fasttrack" ? "bg-amber-100 dark:bg-amber-900/30" : "bg-primary/10"}`}
+                    className={`rounded-xl p-2 self-start ring-1 ${ev.tipo === "fasttrack" ? "bg-amber-100 dark:bg-amber-900/30 ring-amber-200/80" : "bg-[#7C3AED]/10 ring-[#7C3AED]/15"}`}
                   >
                     {ev.tipo === "fasttrack" ? (
-                      <Zap className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+                      <Zap className="h-5 w-5 text-amber-600 dark:text-amber-400" strokeWidth={2.25} />
                     ) : (
-                      <BookOpen className="h-5 w-5 text-primary" />
+                      <BookOpen className="h-5 w-5 text-[#7C3AED]" strokeWidth={2.25} />
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -164,7 +164,7 @@ export function DashboardAlumno() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+            <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" strokeWidth={2.25} />
             Resultados
           </CardTitle>
           <CardDescription>Tus evaluaciones completadas</CardDescription>
@@ -179,7 +179,7 @@ export function DashboardAlumno() {
               {evaluacionesCompletadas.map((ev) => (
                 <div
                   key={ev.id}
-                  className="flex flex-col sm:flex-row sm:items-center gap-4 rounded-lg border p-4 cursor-pointer hover:bg-accent/50 transition-colors"
+                  className="flex flex-col sm:flex-row sm:items-center gap-4 rounded-xl border border-[#E5E7EB] dark:border-border p-4 cursor-pointer hover:bg-[#7C3AED]/[0.04] transition-colors shadow-sm"
                   onClick={() => navigate(`/alumno/resultado/${ev.id}`)}
                 >
                   <div className="flex-1 min-w-0">
@@ -196,7 +196,7 @@ export function DashboardAlumno() {
                       </p>
                     </div>
                     <Badge
-                      variant={ev.nota >= 6 ? "default" : "destructive"}
+                      variant={ev.nota >= 6 ? "success" : "destructive"}
                       className="text-base px-3 py-1"
                     >
                       {ev.nota}
