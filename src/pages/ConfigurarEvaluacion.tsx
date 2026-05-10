@@ -11,10 +11,10 @@ import {
   X,
   Sparkles,
   Loader2,
-  UserPlus,
-  Trash2,
-  GripVertical,
   Eye,
+  Link2,
+  Copy,
+  CheckCircle2,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -52,37 +52,15 @@ interface ArchivoSubido {
   tamano: string
 }
 
-interface AlumnoFila {
-  id: string
-  nombre: string
-  apellido: string
-  dni: string
-  email: string
-  division: string
-}
-
-const alumnosIniciales: AlumnoFila[] = [
-  { id: "1", nombre: "Juan", apellido: "Pérez", dni: "45123456", email: "juan.perez@alumno.edu.ar", division: "A" },
-  { id: "2", nombre: "María", apellido: "López", dni: "45234567", email: "maria.lopez@alumno.edu.ar", division: "A" },
-  { id: "3", nombre: "Carlos", apellido: "García", dni: "45345678", email: "carlos.garcia@alumno.edu.ar", division: "A" },
-  { id: "4", nombre: "Lucía", apellido: "Martínez", dni: "45456789", email: "lucia.martinez@alumno.edu.ar", division: "A" },
-  { id: "5", nombre: "Tomás", apellido: "Rodríguez", dni: "45567890", email: "tomas.rodriguez@alumno.edu.ar", division: "A" },
-  { id: "6", nombre: "Valentina", apellido: "Fernández", dni: "45678901", email: "valentina.f@alumno.edu.ar", division: "A" },
-  { id: "7", nombre: "Mateo", apellido: "Gómez", dni: "45789012", email: "mateo.gomez@alumno.edu.ar", division: "A" },
-  { id: "8", nombre: "Sofía", apellido: "Díaz", dni: "45890123", email: "sofia.diaz@alumno.edu.ar", division: "A" },
-]
-
 const steps = [
   { num: 1, label: "Datos básicos" },
-  { num: 2, label: "Contenidos" },
-  { num: 3, label: "Alumnos" },
+  { num: 2, label: "Contenidos y generación" },
 ]
 
 export function ConfigurarEvaluacion() {
   const navigate = useNavigate()
   const [paso, setPaso] = useState(1)
 
-  // Paso 1
   const [nombre, setNombre] = useState("")
   const [materia, setMateria] = useState("")
   const [curso, setCurso] = useState("")
@@ -91,19 +69,18 @@ export function ConfigurarEvaluacion() {
   const [fecha, setFecha] = useState("")
   const [duracion, setDuracion] = useState("60")
 
-  // Paso 2
   const [archivos, setArchivos] = useState<ArchivoSubido[]>([])
   const [isDragging, setIsDragging] = useState(false)
   const [puntajeTotal, setPuntajeTotal] = useState("100")
   const [puntajeAprobacion, setPuntajeAprobacion] = useState("60")
   const [cantidadPreguntas, setCantidadPreguntas] = useState("10")
 
-  // Paso 3
-  const [alumnos, setAlumnos] = useState<AlumnoFila[]>(alumnosIniciales)
-
-  // Generación IA
   const [generando, setGenerando] = useState(false)
   const [generado, setGenerado] = useState(false)
+  const [linkCopiado, setLinkCopiado] = useState(false)
+  const [tokenGenerado] = useState(() => `eval-${Date.now().toString(36)}`)
+
+  const linkAlumnos = `${window.location.origin}/eval/${tokenGenerado}`
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault()
@@ -145,27 +122,18 @@ export function ConfigurarEvaluacion() {
     setArchivos((prev) => prev.filter((_a, i) => i !== index))
   }
 
-  const agregarAlumnoVacio = () => {
-    setAlumnos((prev) => [
-      ...prev,
-      { id: `new-${Date.now()}`, nombre: "", apellido: "", dni: "", email: "", division: division || "A" },
-    ])
-  }
-
-  const actualizarAlumno = (id: string, field: keyof AlumnoFila, value: string) => {
-    setAlumnos((prev) => prev.map((a) => (a.id === id ? { ...a, [field]: value } : a)))
-  }
-
-  const eliminarAlumno = (id: string) => {
-    setAlumnos((prev) => prev.filter((a) => a.id !== id))
-  }
-
   const handleGenerar = () => {
     setGenerando(true)
     setTimeout(() => {
       setGenerando(false)
       setGenerado(true)
     }, 3000)
+  }
+
+  const handleCopiarLink = () => {
+    navigator.clipboard.writeText(linkAlumnos)
+    setLinkCopiado(true)
+    setTimeout(() => setLinkCopiado(false), 2000)
   }
 
   const getFileIcon = (tipo: string) => {
@@ -177,24 +145,21 @@ export function ConfigurarEvaluacion() {
 
   const canNext = () => {
     if (paso === 1) return nombre && materia && curso && division && fecha && duracion
-    if (paso === 2) return true
-    return alumnos.length > 0
+    return true
   }
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
-      {/* Header */}
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon" onClick={() => paso > 1 ? setPaso(paso - 1) : navigate(-1)}>
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <div>
           <h2 className="text-2xl font-bold tracking-tight">Nueva Evaluación</h2>
-          <p className="text-muted-foreground">Configurá tu evaluación en 3 simples pasos</p>
+          <p className="text-muted-foreground">Configurá tu evaluación y generá el link para los alumnos</p>
         </div>
       </div>
 
-      {/* Stepper */}
       <div className="flex items-center justify-center gap-0">
         {steps.map((step, i) => (
           <div key={step.num} className="flex items-center">
@@ -228,7 +193,6 @@ export function ConfigurarEvaluacion() {
         ))}
       </div>
 
-      {/* Paso 1: Datos básicos */}
       {paso === 1 && (
         <Card>
           <CardHeader>
@@ -321,18 +285,16 @@ export function ConfigurarEvaluacion() {
         </Card>
       )}
 
-      {/* Paso 2: Contenidos */}
       {paso === 2 && (
         <div className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle>Subir contenidos</CardTitle>
               <CardDescription>
-                Subí los archivos con el material de la evaluación. La IA generará las preguntas a partir de estos contenidos.
+                Subí el archivo con el material. La IA generará una evaluación diferente para cada alumno a partir de este documento.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {/* Drop zone */}
               <div
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
@@ -362,7 +324,6 @@ export function ConfigurarEvaluacion() {
                 </p>
               </div>
 
-              {/* Lista de archivos */}
               {archivos.length > 0 && (
                 <div className="space-y-2">
                   {archivos.map((archivo, index) => (
@@ -388,7 +349,7 @@ export function ConfigurarEvaluacion() {
           <Card>
             <CardHeader>
               <CardTitle>Configurar puntajes</CardTitle>
-              <CardDescription>Definí la estructura de puntuación de la evaluación</CardDescription>
+              <CardDescription>Definí la estructura de puntuación</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -430,122 +391,7 @@ export function ConfigurarEvaluacion() {
               </div>
             </CardContent>
           </Card>
-        </div>
-      )}
 
-      {/* Paso 3: Alumnos */}
-      {paso === 3 && (
-        <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <div>
-                  <CardTitle>Lista de alumnos</CardTitle>
-                  <CardDescription>
-                    Cargá la lista de alumnos que rendirán la evaluación
-                  </CardDescription>
-                </div>
-                <div className="flex gap-2">
-                  <label className="inline-flex items-center gap-2 cursor-pointer rounded-md border bg-background px-4 py-2 text-sm font-medium hover:bg-accent transition-colors">
-                    <FileSpreadsheet className="h-4 w-4 text-emerald-500" />
-                    Importar Excel
-                    <input type="file" accept=".xlsx,.xls,.csv" className="hidden" />
-                  </label>
-                  <Button onClick={agregarAlumnoVacio} variant="outline" className="gap-2">
-                    <UserPlus className="h-4 w-4" />
-                    Agregar
-                  </Button>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="rounded-lg border overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b bg-muted/50">
-                        <th className="w-10 px-2 py-3" />
-                        <th className="text-left font-medium text-muted-foreground px-3 py-3">Nombre</th>
-                        <th className="text-left font-medium text-muted-foreground px-3 py-3">Apellido</th>
-                        <th className="text-left font-medium text-muted-foreground px-3 py-3">DNI</th>
-                        <th className="text-left font-medium text-muted-foreground px-3 py-3">Email</th>
-                        <th className="text-left font-medium text-muted-foreground px-3 py-3">Div.</th>
-                        <th className="w-10 px-2 py-3" />
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {alumnos.map((alumno) => (
-                        <tr key={alumno.id} className="border-b last:border-0 group hover:bg-accent/30">
-                          <td className="px-2 py-2 text-center">
-                            <GripVertical className="h-4 w-4 text-muted-foreground/40 mx-auto" />
-                          </td>
-                          <td className="px-3 py-2">
-                            <Input
-                              value={alumno.nombre}
-                              onChange={(e: React.ChangeEvent<HTMLInputElement>) => actualizarAlumno(alumno.id, "nombre", e.target.value)}
-                              placeholder="Nombre"
-                              className="h-8 border-0 bg-transparent px-1 focus-visible:bg-background focus-visible:border focus-visible:px-2"
-                            />
-                          </td>
-                          <td className="px-3 py-2">
-                            <Input
-                              value={alumno.apellido}
-                              onChange={(e: React.ChangeEvent<HTMLInputElement>) => actualizarAlumno(alumno.id, "apellido", e.target.value)}
-                              placeholder="Apellido"
-                              className="h-8 border-0 bg-transparent px-1 focus-visible:bg-background focus-visible:border focus-visible:px-2"
-                            />
-                          </td>
-                          <td className="px-3 py-2">
-                            <Input
-                              value={alumno.dni}
-                              onChange={(e: React.ChangeEvent<HTMLInputElement>) => actualizarAlumno(alumno.id, "dni", e.target.value)}
-                              placeholder="DNI"
-                              className="h-8 border-0 bg-transparent px-1 font-mono text-xs focus-visible:bg-background focus-visible:border focus-visible:px-2"
-                            />
-                          </td>
-                          <td className="px-3 py-2">
-                            <Input
-                              value={alumno.email}
-                              onChange={(e: React.ChangeEvent<HTMLInputElement>) => actualizarAlumno(alumno.id, "email", e.target.value)}
-                              placeholder="email@alumno.edu.ar"
-                              className="h-8 border-0 bg-transparent px-1 text-xs focus-visible:bg-background focus-visible:border focus-visible:px-2"
-                            />
-                          </td>
-                          <td className="px-3 py-2">
-                            <Input
-                              value={alumno.division}
-                              onChange={(e: React.ChangeEvent<HTMLInputElement>) => actualizarAlumno(alumno.id, "division", e.target.value)}
-                              placeholder="A"
-                              className="h-8 w-12 border-0 bg-transparent px-1 text-center focus-visible:bg-background focus-visible:border focus-visible:px-2"
-                            />
-                          </td>
-                          <td className="px-2 py-2 text-center">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-7 w-7 opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive"
-                              onClick={() => eliminarAlumno(alumno.id)}
-                            >
-                              <Trash2 className="h-3.5 w-3.5" />
-                            </Button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-              <div className="flex items-center justify-between mt-3 text-sm text-muted-foreground">
-                <span>{alumnos.length} alumnos cargados</span>
-                <Button variant="link" size="sm" onClick={agregarAlumnoVacio} className="text-primary gap-1 px-0">
-                  <UserPlus className="h-3.5 w-3.5" />
-                  Agregar fila
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Botón Generar */}
           {!generado ? (
             <Card className={cn(
               "border-2 transition-all",
@@ -561,9 +407,9 @@ export function ConfigurarEvaluacion() {
                       </div>
                     </div>
                     <div>
-                      <p className="text-lg font-semibold">Generando evaluación con IA...</p>
+                      <p className="text-lg font-semibold">Generando evaluaciones con IA...</p>
                       <p className="text-sm text-muted-foreground mt-1">
-                        Analizando contenidos y creando preguntas personalizadas
+                        Creando una evaluación diferente para cada alumno que se conecte
                       </p>
                     </div>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -579,8 +425,8 @@ export function ConfigurarEvaluacion() {
                     <div>
                       <p className="text-lg font-semibold">Todo listo para generar</p>
                       <p className="text-sm text-muted-foreground mt-1 max-w-md">
-                        La IA creará {cantidadPreguntas} preguntas basadas en los contenidos subidos,
-                        adaptadas al nivel de {curso} {division}
+                        La IA creará {cantidadPreguntas} preguntas basadas en los contenidos subidos.
+                        Cada alumno recibirá una evaluación diferente.
                       </p>
                     </div>
                     <Button onClick={handleGenerar} size="lg" className="gap-2 shadow-lg shadow-primary/25 mt-2">
@@ -592,36 +438,84 @@ export function ConfigurarEvaluacion() {
               </CardContent>
             </Card>
           ) : (
-            <Card className="border-2 border-emerald-300 dark:border-emerald-700 bg-emerald-50/50 dark:bg-emerald-900/10">
-              <CardContent className="flex flex-col items-center justify-center py-10 text-center space-y-4">
-                <div className="rounded-full bg-emerald-100 dark:bg-emerald-900/30 p-5">
-                  <Check className="h-10 w-10 text-emerald-600 dark:text-emerald-400" />
-                </div>
-                <div>
-                  <p className="text-lg font-semibold text-emerald-700 dark:text-emerald-300">
-                    ¡Evaluación generada exitosamente!
-                  </p>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Se generaron {cantidadPreguntas} preguntas para {alumnos.length} alumnos
-                  </p>
-                </div>
-                <div className="flex gap-3">
-                  <Button variant="outline" onClick={() => navigate("/dashboard")}>
-                    Volver al Dashboard
-                  </Button>
-                  <Button className="gap-2">
-                    <Eye className="h-4 w-4" />
-                    Ver Evaluación
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            <div className="space-y-4">
+              <Card className="border-2 border-emerald-300 dark:border-emerald-700 bg-emerald-50/50 dark:bg-emerald-900/10">
+                <CardContent className="flex flex-col items-center justify-center py-8 text-center space-y-4">
+                  <div className="rounded-full bg-emerald-100 dark:bg-emerald-900/30 p-5">
+                    <CheckCircle2 className="h-10 w-10 text-emerald-600 dark:text-emerald-400" />
+                  </div>
+                  <div>
+                    <p className="text-lg font-semibold text-emerald-700 dark:text-emerald-300">
+                      ¡Evaluación generada exitosamente!
+                    </p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Se generarán {cantidadPreguntas} preguntas diferentes para cada alumno que se conecte
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Link2 className="h-5 w-5 text-primary" />
+                    Link de acceso para alumnos
+                  </CardTitle>
+                  <CardDescription>
+                    Compartí este link con tus alumnos. Al acceder, se registrarán automáticamente
+                    y el listado se generará en orden alfabético.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <Input
+                      readOnly
+                      value={linkAlumnos}
+                      className="font-mono text-sm bg-muted"
+                    />
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={handleCopiarLink}
+                      className="shrink-0"
+                    >
+                      {linkCopiado ? (
+                        <Check className="h-4 w-4 text-emerald-600" />
+                      ) : (
+                        <Copy className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
+                  {linkCopiado && (
+                    <p className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">
+                      ¡Link copiado al portapapeles!
+                    </p>
+                  )}
+                  <div className="rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 p-3">
+                    <p className="text-sm text-blue-800 dark:text-blue-200">
+                      <strong>¿Cómo funciona?</strong> Los alumnos acceden al link, se loguean con su cuenta,
+                      y automáticamente quedan registrados en la evaluación. El listado se ordena alfabéticamente.
+                      Cada alumno recibe una evaluación diferente generada por IA.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <div className="flex gap-3">
+                <Button variant="outline" onClick={() => navigate("/dashboard")}>
+                  Volver al Dashboard
+                </Button>
+                <Button className="gap-2">
+                  <Eye className="h-4 w-4" />
+                  Ver Evaluación
+                </Button>
+              </div>
+            </div>
           )}
         </div>
       )}
 
-      {/* Navigation buttons */}
-      {!(paso === 3 && generado) && (
+      {!(paso === 2 && generado) && (
         <div className="flex items-center justify-between pt-2">
           <Button
             variant="outline"
@@ -644,7 +538,7 @@ export function ConfigurarEvaluacion() {
             ))}
           </div>
 
-          {paso < 3 ? (
+          {paso < 2 ? (
             <Button onClick={() => setPaso(paso + 1)} disabled={!canNext()} className="gap-2">
               Siguiente
               <ArrowRight className="h-4 w-4" />

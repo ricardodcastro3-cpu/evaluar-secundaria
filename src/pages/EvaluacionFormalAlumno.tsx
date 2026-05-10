@@ -185,10 +185,15 @@ export function EvaluacionFormalAlumno() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950/20">
       {/* Banner rojo superior */}
       <div className="bg-red-600 dark:bg-red-800 text-white">
-        <div className="mx-auto max-w-3xl px-4 py-2.5 flex items-center justify-center gap-2">
-          <ShieldAlert className="h-4 w-4 shrink-0" />
-          <p className="text-sm font-semibold text-center">
-            EVALUACIÓN FORMAL — No se puede pausar ni reiniciar
+        <div className="mx-auto max-w-3xl px-4 py-2.5 flex flex-col items-center gap-1">
+          <div className="flex items-center gap-2">
+            <ShieldAlert className="h-4 w-4 shrink-0" />
+            <p className="text-sm font-semibold text-center">
+              EVALUACIÓN FORMAL — No se puede pausar ni reiniciar
+            </p>
+          </div>
+          <p className="text-xs text-red-200 text-center">
+            Los resultados del Fast Track fueron borrados. Ya no podés volver a practicar.
           </p>
         </div>
       </div>

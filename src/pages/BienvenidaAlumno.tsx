@@ -155,7 +155,14 @@ export function BienvenidaAlumno() {
           </CardContent>
         </Card>
 
-        <p className="text-center text-xs text-muted-foreground mt-6">
+        <div className="rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 p-3 mt-4">
+          <p className="text-xs text-blue-800 dark:text-blue-200 text-center">
+            Al acceder a esta evaluación quedás registrado/a automáticamente.
+            El listado de alumnos se genera en orden alfabético.
+          </p>
+        </div>
+
+        <p className="text-center text-xs text-muted-foreground mt-4">
           EvalAr v1.0 · Si tenés problemas, contactá a tu docente
         </p>
       </div>

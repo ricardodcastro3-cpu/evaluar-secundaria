@@ -5,7 +5,6 @@ import { Layout } from "@/components/Layout"
 import { Login } from "@/pages/Login"
 import { DashboardDocente } from "@/pages/DashboardDocente"
 import { ConfigurarEvaluacion } from "@/pages/ConfigurarEvaluacion"
-import { SubirAlumnos } from "@/pages/SubirAlumnos"
 import { DashboardAlumno } from "@/pages/DashboardAlumno"
 import { FastTrack } from "@/pages/FastTrack"
 import { EvaluacionFormal } from "@/pages/EvaluacionFormal"
@@ -80,14 +79,6 @@ function AppRoutes() {
           element={
             <DocenteRoute>
               <ConfigurarEvaluacion />
-            </DocenteRoute>
-          }
-        />
-        <Route
-          path="/docente/alumnos"
-          element={
-            <DocenteRoute>
-              <SubirAlumnos />
             </DocenteRoute>
           }
         />

@@ -2,10 +2,8 @@ import { NavLink } from "react-router-dom"
 import {
   LayoutDashboard,
   FileText,
-  Users,
   Zap,
   ClipboardCheck,
-  BarChart3,
   X,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -29,8 +27,6 @@ const docenteLinks = [
     label: "Nueva Evaluación",
     icon: FileText,
   },
-  { to: "/docente/alumnos", label: "Alumnos", icon: Users },
-  { to: "/docente/reportes", label: "Reportes", icon: BarChart3 },
 ]
 
 const alumnoLinks = [
