@@ -55,7 +55,7 @@ export function Login() {
 
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-indigo-600 via-indigo-500 to-blue-400 dark:from-indigo-950 dark:via-slate-900 dark:to-slate-950" />
+      <div className="absolute inset-0 bg-gradient-to-br from-[#1A237E] via-[#283593] to-[#0097A7] dark:from-[#0F172A] dark:via-[#1E293B] dark:to-[#0D47A1]" />
 
       <div className="absolute inset-0 opacity-[0.07]">
         <div className="absolute top-20 left-10 h-72 w-72 rounded-full bg-white blur-3xl" />
@@ -67,7 +67,7 @@ export function Login() {
         variant="ghost"
         size="icon"
         onClick={toggleTheme}
-        className="fixed top-4 right-4 rounded-full text-white/80 hover:text-white hover:bg-white/10 z-50"
+        className="fixed top-4 right-4 rounded-full text-white/70 hover:text-white hover:bg-white/10 z-50"
       >
         {theme === "light" ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
       </Button>
@@ -82,7 +82,7 @@ export function Login() {
             <h1 className="text-4xl font-extrabold tracking-tight text-white">
               EVALUACIONES SAN JUAN
             </h1>
-            <p className="text-sm text-indigo-200/80 max-w-xs mx-auto leading-relaxed">
+            <p className="text-sm text-sky-200/80 max-w-xs mx-auto leading-relaxed">
               Nivel Secundario — Ciclo Básico y Orientado — San Juan, República Argentina
             </p>
           </div>
@@ -94,7 +94,7 @@ export function Login() {
               <h2 className="text-xl font-semibold text-white">
                 Bienvenido/a
               </h2>
-              <p className="text-sm text-indigo-200/80">
+              <p className="text-sm text-sky-200/80">
                 Ingresá con tu cuenta institucional
               </p>
             </div>
@@ -128,13 +128,13 @@ export function Login() {
                 <div className="w-full border-t border-white/20" />
               </div>
               <div className="relative flex justify-center text-xs">
-                <span className="bg-transparent px-3 text-indigo-200/60">
+                <span className="bg-transparent px-3 text-sky-200/60">
                   acceso exclusivo para docentes
                 </span>
               </div>
             </div>
 
-            <p className="text-center text-xs text-indigo-200/50 leading-relaxed">
+            <p className="text-center text-xs text-sky-200/50 leading-relaxed">
               Al ingresar aceptás los{" "}
               <button type="button" className="underline hover:text-white transition-colors">
                 términos de servicio
@@ -147,7 +147,7 @@ export function Login() {
           </div>
         </div>
 
-        <p className="text-center text-xs text-indigo-200/40">
+        <p className="text-center text-xs text-sky-200/40">
           Diseño de propiedad intelectual del Profesor RICARDO DAMIÁN CASTRO — San Juan, República Argentina
         </p>
       </div>
