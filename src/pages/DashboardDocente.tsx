@@ -1,137 +1,188 @@
-import { ArrowUpRight, ClipboardList, GraduationCap, TrendingUp, Users } from "lucide-react";
+import { CalendarDays, Clock3, FileText, Plus, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { useAlumnoStore } from "@/store/alumnoStore";
-import { useEvaluacionStore } from "@/store/evaluacionStore";
-import type { EstadisticaDocente } from "@/types";
 
-const estadisticas: EstadisticaDocente[] = [
-  { etiqueta: "Cursos activos", valor: "4", detalle: "2 con evaluaciones esta semana", tendencia: "positiva" },
-  { etiqueta: "Evaluaciones", valor: "12", detalle: "3 en borrador", tendencia: "neutral" },
-  { etiqueta: "Promedio general", valor: "7.8", detalle: "+0.6 vs trimestre anterior", tendencia: "positiva" },
+const evaluacionesActivas = [
+  {
+    id: "eva-mat-4b",
+    materia: "Matematica",
+    curso: "4to B",
+    fecha: "18/05/2026",
+    alumnos: 31,
+    estado: "activa",
+    titulo: "Funciones lineales y modelizacion",
+  },
+  {
+    id: "eva-len-3a",
+    materia: "Lengua",
+    curso: "3ro A",
+    fecha: "22/05/2026",
+    alumnos: 27,
+    estado: "borrador",
+    titulo: "Textos argumentativos",
+  },
+  {
+    id: "eva-his-5c",
+    materia: "Historia",
+    curso: "5to C",
+    fecha: "08/05/2026",
+    alumnos: 24,
+    estado: "finalizada",
+    titulo: "Modelo agroexportador",
+  },
 ];
 
+const seguimientoAlumnos = [
+  {
+    alumno: "Garcia, Mateo",
+    estado: "Entregado",
+    intentosFastTrack: 2,
+    nota: "8.2",
+    tiempo: "38 min",
+  },
+  {
+    alumno: "Molina, Sofia",
+    estado: "En progreso",
+    intentosFastTrack: 1,
+    nota: "-",
+    tiempo: "21 min",
+  },
+  {
+    alumno: "Pereyra, Tomas",
+    estado: "Pendiente",
+    intentosFastTrack: 3,
+    nota: "-",
+    tiempo: "0 min",
+  },
+  {
+    alumno: "Rodriguez, Lucia",
+    estado: "Entregado",
+    intentosFastTrack: 1,
+    nota: "9.1",
+    tiempo: "35 min",
+  },
+];
+
+const estadoVariant = {
+  activa: "success",
+  borrador: "warning",
+  finalizada: "secondary",
+} as const;
+
 export function DashboardDocente() {
-  const alumnos = useAlumnoStore((state) => state.alumnos);
-  const evaluaciones = useEvaluacionStore((state) => state.evaluaciones);
-
   return (
-    <div className="space-y-8">
-      <section className="grid gap-6 lg:grid-cols-[1.4fr_0.6fr]">
-        <Card className="overflow-hidden border-0 bg-primary text-primary-foreground shadow-xl shadow-indigo-500/20">
-          <CardContent className="p-6 sm:p-8">
-            <Badge className="mb-4 bg-white/15 text-white">Panel docente</Badge>
-            <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              Gestiona tus evaluaciones con seguimiento claro del aula.
-            </h1>
-            <p className="mt-4 max-w-2xl text-sm leading-6 text-white/80 sm:text-base">
-              Configura criterios, revisa avances y prepara devoluciones accionables para tus
-              estudiantes de secundaria.
-            </p>
-            <div className="mt-6 flex flex-wrap gap-3">
-              <Button asChild variant="secondary">
-                <Link to="/configurar-evaluacion">Crear evaluacion</Link>
-              </Button>
-              <Button asChild variant="outline" className="border-white/30 bg-white/10 text-white hover:bg-white/20">
-                <Link to="/subir-alumnos">Cargar alumnos</Link>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Actividad reciente</CardTitle>
-            <CardDescription>Resumen del ciclo lectivo 2026</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">Entregas revisadas</span>
-              <span className="font-semibold">68%</span>
-            </div>
-            <Progress value={68} />
-            <div className="grid grid-cols-2 gap-3 pt-2">
-              <div className="rounded-xl bg-muted p-3">
-                <Users className="mb-2 h-4 w-4 text-primary" />
-                <p className="text-2xl font-bold">{alumnos.length}</p>
-                <p className="text-xs text-muted-foreground">Alumnos demo</p>
-              </div>
-              <div className="rounded-xl bg-muted p-3">
-                <ClipboardList className="mb-2 h-4 w-4 text-primary" />
-                <p className="text-2xl font-bold">{evaluaciones.length}</p>
-                <p className="text-xs text-muted-foreground">Evaluaciones</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+    <div className="space-y-7">
+      <section className="flex flex-col justify-between gap-4 rounded-3xl border bg-card p-6 shadow-sm sm:flex-row sm:items-center">
+        <div>
+          <Badge variant="secondary">Dashboard docente</Badge>
+          <h1 className="mt-3 text-3xl font-bold tracking-tight">Mis Evaluaciones</h1>
+          <p className="mt-2 max-w-2xl text-muted-foreground">
+            Vista general de evaluaciones activas, borradores y seguimiento de alumnos con datos
+            mock realistas.
+          </p>
+        </div>
+        <Button asChild size="lg" className="h-12 shrink-0 shadow-lg shadow-indigo-500/20">
+          <Link to="/nueva-evaluacion">
+            <Plus className="h-5 w-5" />
+            Nueva Evaluacion
+          </Link>
+        </Button>
       </section>
 
       <section className="grid gap-4 md:grid-cols-3">
-        {estadisticas.map((item) => (
-          <Card key={item.etiqueta}>
-            <CardContent className="p-5">
-              <div className="mb-4 flex items-center justify-between">
-                <p className="text-sm text-muted-foreground">{item.etiqueta}</p>
-                {item.tendencia === "positiva" ? (
-                  <TrendingUp className="h-4 w-4 text-emerald-500" />
-                ) : (
-                  <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
-                )}
+        {evaluacionesActivas.map((evaluacion) => (
+          <Card key={evaluacion.id} className="overflow-hidden transition hover:-translate-y-1 hover:shadow-xl">
+            <CardHeader className="pb-3">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <CardTitle className="text-lg">{evaluacion.materia}</CardTitle>
+                  <CardDescription className="mt-1">{evaluacion.titulo}</CardDescription>
+                </div>
+                <Badge variant={estadoVariant[evaluacion.estado as keyof typeof estadoVariant]}>
+                  {evaluacion.estado}
+                </Badge>
               </div>
-              <p className="text-3xl font-bold">{item.valor}</p>
-              <p className="mt-1 text-sm text-muted-foreground">{item.detalle}</p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div className="rounded-2xl bg-muted p-3">
+                  <FileText className="mb-2 h-4 w-4 text-primary" />
+                  <p className="text-xs text-muted-foreground">Curso</p>
+                  <p className="font-semibold">{evaluacion.curso}</p>
+                </div>
+                <div className="rounded-2xl bg-muted p-3">
+                  <Users className="mb-2 h-4 w-4 text-primary" />
+                  <p className="text-xs text-muted-foreground">Alumnos</p>
+                  <p className="font-semibold">{evaluacion.alumnos}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 rounded-2xl border px-3 py-2 text-sm text-muted-foreground">
+                <CalendarDays className="h-4 w-4 text-primary" />
+                Fecha: <span className="font-semibold text-foreground">{evaluacion.fecha}</span>
+              </div>
             </CardContent>
           </Card>
         ))}
       </section>
 
-      <section className="grid gap-6 lg:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Evaluaciones proximas</CardTitle>
-            <CardDescription>Acceso rapido a estados y materias.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {evaluaciones.map((evaluacion) => (
-              <div key={evaluacion.id} className="flex items-center justify-between rounded-xl border p-4">
-                <div>
-                  <p className="font-semibold">{evaluacion.titulo}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {evaluacion.materia} · {evaluacion.duracionMinutos} min
-                  </p>
-                </div>
-                <Badge variant={evaluacion.estado === "activa" ? "success" : "secondary"}>
-                  {evaluacion.estado}
-                </Badge>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Alumnos destacados</CardTitle>
-            <CardDescription>Seguimiento por progreso y promedio.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {alumnos.map((alumno) => (
-              <div key={alumno.id} className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="flex items-center gap-2 font-medium">
-                    <GraduationCap className="h-4 w-4 text-primary" />
-                    {alumno.apellido}, {alumno.nombre}
-                  </span>
-                  <span className="text-sm text-muted-foreground">{alumno.promedio}</span>
-                </div>
-                <Progress value={alumno.progreso} />
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-      </section>
+      <Card>
+        <CardHeader className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+          <div>
+            <CardTitle>Seguimiento de alumnos</CardTitle>
+            <CardDescription>
+              Tabla demo con estado, intentos FastTrack, nota y tiempo de resolucion.
+            </CardDescription>
+          </div>
+          <Button asChild variant="outline">
+            <Link to="/subir-alumnos">Gestionar alumnos</Link>
+          </Button>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto rounded-2xl border">
+            <table className="w-full min-w-[720px] border-collapse text-left text-sm">
+              <thead className="bg-muted text-xs uppercase tracking-wide text-muted-foreground">
+                <tr>
+                  <th className="px-4 py-3 font-semibold">Alumno</th>
+                  <th className="px-4 py-3 font-semibold">Estado</th>
+                  <th className="px-4 py-3 font-semibold">Intentos FastTrack</th>
+                  <th className="px-4 py-3 font-semibold">Nota</th>
+                  <th className="px-4 py-3 font-semibold">Tiempo</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y">
+                {seguimientoAlumnos.map((fila) => (
+                  <tr key={fila.alumno} className="bg-card transition hover:bg-muted/60">
+                    <td className="px-4 py-4 font-semibold">{fila.alumno}</td>
+                    <td className="px-4 py-4">
+                      <Badge
+                        variant={
+                          fila.estado === "Entregado"
+                            ? "success"
+                            : fila.estado === "En progreso"
+                              ? "warning"
+                              : "outline"
+                        }
+                      >
+                        {fila.estado}
+                      </Badge>
+                    </td>
+                    <td className="px-4 py-4">{fila.intentosFastTrack}</td>
+                    <td className="px-4 py-4 font-semibold">{fila.nota}</td>
+                    <td className="px-4 py-4">
+                      <span className="inline-flex items-center gap-2">
+                        <Clock3 className="h-4 w-4 text-primary" />
+                        {fila.tiempo}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

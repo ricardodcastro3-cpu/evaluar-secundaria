@@ -1,21 +1,18 @@
 import {
   BarChart3,
   ClipboardCheck,
-  FileUp,
-  Gauge,
   GraduationCap,
-  LayoutDashboard,
   Sparkles,
+  Users,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
 const docenteLinks = [
-  { to: "/docente", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/configurar-evaluacion", label: "Configurar", icon: ClipboardCheck },
-  { to: "/subir-alumnos", label: "Alumnos", icon: FileUp },
-  { to: "/fast-track", label: "Fast Track", icon: Gauge },
-  { to: "/resultado", label: "Resultados", icon: BarChart3 },
+  { to: "/dashboard", label: "Mis Evaluaciones", icon: ClipboardCheck },
+  { to: "/nueva-evaluacion", label: "Nueva Evaluacion", icon: Sparkles },
+  { to: "/subir-alumnos", label: "Alumnos", icon: Users },
+  { to: "/resultado", label: "Reportes", icon: BarChart3 },
 ];
 
 const alumnoLinks = [

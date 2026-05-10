@@ -5,10 +5,10 @@ import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/authStore";
 
 const mobileLinks = [
-  { to: "/docente", label: "Docente" },
-  { to: "/configurar-evaluacion", label: "Configurar" },
+  { to: "/dashboard", label: "Evaluaciones" },
+  { to: "/nueva-evaluacion", label: "Nueva" },
   { to: "/subir-alumnos", label: "Alumnos" },
-  { to: "/alumno", label: "Alumno" },
+  { to: "/resultado", label: "Reportes" },
 ];
 
 export function Header() {
@@ -17,13 +17,13 @@ export function Header() {
 
   const handleLogout = () => {
     logout();
-    navigate("/");
+    navigate("/login");
   };
 
   return (
     <header className="sticky top-0 z-30 border-b bg-background/85 backdrop-blur-xl">
       <div className="flex min-h-16 items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
-        <Link to={usuario?.rol === "alumno" ? "/alumno" : "/docente"} className="flex items-center gap-3">
+        <Link to={usuario?.rol === "alumno" ? "/alumno" : "/dashboard"} className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary text-sm font-bold text-primary-foreground lg:hidden">
             EA
           </div>

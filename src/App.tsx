@@ -16,7 +16,7 @@ function AppLayout() {
   const usuario = useAuthStore((state) => state.usuario);
 
   if (!usuario) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   return (
@@ -43,17 +43,20 @@ export default function App() {
 
   return (
     <Routes>
-      <Route path="/" element={<Login />} />
+      <Route path="/" element={<Navigate to="/login" replace />} />
+      <Route path="/login" element={<Login />} />
       <Route element={<AppLayout />}>
-        <Route path="/docente" element={<DashboardDocente />} />
-        <Route path="/configurar-evaluacion" element={<ConfigurarEvaluacion />} />
+        <Route path="/dashboard" element={<DashboardDocente />} />
+        <Route path="/nueva-evaluacion" element={<ConfigurarEvaluacion />} />
+        <Route path="/docente" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/configurar-evaluacion" element={<Navigate to="/nueva-evaluacion" replace />} />
         <Route path="/subir-alumnos" element={<SubirAlumnos />} />
         <Route path="/alumno" element={<DashboardAlumno />} />
         <Route path="/fast-track" element={<FastTrack />} />
         <Route path="/evaluacion-formal" element={<EvaluacionFormal />} />
         <Route path="/resultado" element={<Resultado />} />
       </Route>
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   );
 }
