@@ -1,0 +1,5 @@
+/**
+ * Estilos globales del sistema (tema edu 2024: violeta #7C3AED, azul #2563EB, acento #F59E0B).
+ * Tipografía: Poppins 600/700 (títulos y .font-subheading) + Inter 400/500 (cuerpo; font-semibold → 500 vía tema).
+ */
+@import "./index.css";
