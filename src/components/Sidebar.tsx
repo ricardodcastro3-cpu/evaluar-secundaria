@@ -55,7 +55,7 @@ const alumnoLinks = [
 
 export function Sidebar({ open, onClose }: SidebarProps) {
   const { user, isDocente, isAdmin } = useAuthStore()
-  const docenteView = isDocente || isAdmin || user?.rol === "docente"
+  const docenteView = isDocente || isAdmin
   const links = docenteView ? docenteLinks : alumnoLinks
 
   return (

@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom"
+import { Navigate, useNavigate } from "react-router-dom"
 import {
   BookOpen,
   Zap,
@@ -51,7 +51,12 @@ const evaluacionesCompletadas = [
 
 export function DashboardAlumno() {
   const navigate = useNavigate()
-  const { user } = useAuthStore()
+  const { user, isDocente, isAdmin, loading } = useAuthStore()
+
+  if (loading) return null
+  if (isDocente || isAdmin) {
+    return <Navigate to={isAdmin && !isDocente ? "/admin/docentes" : "/dashboard"} replace />
+  }
 
   return (
     <div className="space-y-6">
