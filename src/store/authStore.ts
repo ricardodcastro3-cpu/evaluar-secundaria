@@ -194,9 +194,22 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ loading: true, error: null })
 
     try {
-      const {
+      let {
         data: { session },
       } = await supabase.auth.getSession()
+
+      if (!session?.user) {
+        await new Promise<void>((r) => queueMicrotask(r))
+        ;({
+          data: { session },
+        } = await supabase.auth.getSession())
+      }
+      if (!session?.user) {
+        await new Promise((r) => setTimeout(r, 120))
+        ;({
+          data: { session },
+        } = await supabase.auth.getSession())
+      }
 
       if (!session?.user) {
         set({
@@ -223,28 +236,73 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         const { data: docenteRow } = await supabase
           .from("docentes")
           .select("id")
-          .eq("email", email)
+          .ilike("email", email)
           .maybeSingle()
 
         const isInDocentes = Boolean(docenteRow)
 
-        if (oauthIntent === "alumno" || oauthIntent === null) {
-          mapped.rol = isInDocentes ? "docente" : "alumno"
-          let solicitud: SolicitudDocente | null = null
-          if (!isInDocentes && oauthIntent === null) {
-            const { data: sol } = await supabase
-              .from("solicitudes_docentes")
-              .select("*")
-              .eq("email", email)
-              .maybeSingle()
-            solicitud = sol as SolicitudDocente | null
+        /**
+         * Sin intención OAuth (refresh, onAuthStateChange, etc.): primero docente/admin.
+         * Así no se trata como alumno a quien ya está en `docentes`.
+         */
+        if (oauthIntent === null) {
+          if (isAdmin) {
+            mapped.rol = "docente"
+            set({
+              user: mapped,
+              isDocente: isInDocentes,
+              isAdmin: true,
+              isAuthenticated: true,
+              docenteSolicitud: null,
+              solicitudJustCreated: false,
+              loading: false,
+              lastOAuthEntry: null,
+            })
+            return
           }
+          if (isInDocentes) {
+            mapped.rol = "docente"
+            set({
+              user: mapped,
+              isDocente: true,
+              isAdmin: false,
+              isAuthenticated: true,
+              docenteSolicitud: null,
+              solicitudJustCreated: false,
+              loading: false,
+              lastOAuthEntry: null,
+            })
+            return
+          }
+          mapped.rol = "alumno"
+          let solicitud: SolicitudDocente | null = null
+          const { data: sol } = await supabase
+            .from("solicitudes_docentes")
+            .select("*")
+            .ilike("email", email)
+            .maybeSingle()
+          solicitud = sol as SolicitudDocente | null
+          set({
+            user: mapped,
+            isDocente: false,
+            isAdmin: false,
+            isAuthenticated: true,
+            docenteSolicitud: solicitud,
+            solicitudJustCreated: false,
+            loading: false,
+            lastOAuthEntry: null,
+          })
+          return
+        }
+
+        if (oauthIntent === "alumno") {
+          mapped.rol = isInDocentes ? "docente" : "alumno"
           set({
             user: mapped,
             isDocente: isInDocentes,
             isAdmin,
             isAuthenticated: true,
-            docenteSolicitud: solicitud,
+            docenteSolicitud: null,
             solicitudJustCreated: false,
             loading: false,
             lastOAuthEntry: oauthIntent,
@@ -285,7 +343,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         const { data: existingSolRaw } = await supabase
           .from("solicitudes_docentes")
           .select("*")
-          .eq("email", email)
+          .ilike("email", email)
           .maybeSingle()
 
         let sol = existingSolRaw as SolicitudDocente | null
@@ -343,7 +401,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           const { data: refreshed } = await supabase
             .from("solicitudes_docentes")
             .select("*")
-            .eq("email", email)
+            .ilike("email", email)
             .maybeSingle()
           sol = refreshed as SolicitudDocente | null
         }
@@ -379,6 +437,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     } catch (e) {
       console.error("[auth] checkSession:", e)
       set({
+        user: null,
+        isDocente: false,
+        isAdmin: false,
+        isAuthenticated: false,
+        docenteSolicitud: null,
+        solicitudJustCreated: false,
         loading: false,
         error: e instanceof Error ? e.message : "Error de sesión.",
         lastOAuthEntry: null,

@@ -1,6 +1,6 @@
 import { supabase, isSupabaseConfigured } from "@/lib/supabase"
 
-/** Lee `code` OAuth en query o en hash (#access_token legacy no aplica a PKCE). */
+/** Lee `code` OAuth en query o en hash. */
 export function readOAuthCodeFromUrl(): string | null {
   if (typeof window === "undefined") return null
   const search = new URLSearchParams(window.location.search).get("code")
@@ -45,14 +45,16 @@ export function stripOAuthParamsFromUrl(): void {
   window.history.replaceState({}, document.title, next)
 }
 
+type ExchangeResult = { ok: boolean; errorMessage: string | null }
+
+/** Una sola promesa si main.tsx y otro caller disparan a la vez (poco habitual). */
+let exchangeInFlight: Promise<ExchangeResult> | null = null
+
 /**
- * Intercambia el `code` PKCE por sesión. Debe ejecutarse antes de cualquier
- * `getSession()` en la vuelta de OAuth.
+ * Intercambia `code` PKCE por sesión. Ejecutar **antes** de React para evitar carreras
+ * con getSession / rutas protegidas.
  */
-export async function exchangeOAuthCodeFromUrl(): Promise<{
-  ok: boolean
-  errorMessage: string | null
-}> {
+export async function exchangeOAuthCodeFromUrl(): Promise<ExchangeResult> {
   if (!isSupabaseConfigured() || !supabase) {
     return { ok: false, errorMessage: "Supabase no está configurado." }
   }
@@ -68,20 +70,44 @@ export async function exchangeOAuthCodeFromUrl(): Promise<{
     return { ok: true, errorMessage: null }
   }
 
-  const { data, error } = await supabase.auth.exchangeCodeForSession(code)
-  stripOAuthParamsFromUrl()
+  if (exchangeInFlight) return exchangeInFlight
 
-  if (error) {
-    console.error("[auth] exchangeCodeForSession:", error.message)
-    return { ok: false, errorMessage: error.message }
-  }
+  exchangeInFlight = (async (): Promise<ExchangeResult> => {
+    const client = supabase
+    try {
+      const { data, error } = await client.auth.exchangeCodeForSession(code)
 
-  if (!data.session) {
-    return {
-      ok: false,
-      errorMessage: "No se obtuvo sesión tras el intercambio PKCE.",
+      if (error) {
+        console.error("[auth] exchangeCodeForSession:", error.message)
+        stripOAuthParamsFromUrl()
+        return { ok: false, errorMessage: error.message }
+      }
+
+      if (!data.session) {
+        stripOAuthParamsFromUrl()
+        return {
+          ok: false,
+          errorMessage: "No se obtuvo sesión tras el intercambio PKCE.",
+        }
+      }
+
+      // Refuerzo persistencia (algunos entornos no devuelven sesión estable en el primer getSession).
+      const { error: setErr } = await client.auth.setSession({
+        access_token: data.session.access_token,
+        refresh_token: data.session.refresh_token,
+      })
+      if (setErr) {
+        console.error("[auth] setSession tras PKCE:", setErr.message)
+        stripOAuthParamsFromUrl()
+        return { ok: false, errorMessage: setErr.message }
+      }
+
+      stripOAuthParamsFromUrl()
+      return { ok: true, errorMessage: null }
+    } finally {
+      exchangeInFlight = null
     }
-  }
+  })()
 
-  return { ok: true, errorMessage: null }
+  return exchangeInFlight
 }

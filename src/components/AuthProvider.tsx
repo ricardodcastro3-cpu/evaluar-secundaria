@@ -1,39 +1,18 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react"
-import { exchangeOAuthCodeFromUrl } from "@/lib/auth/pkce"
 import { isSupabaseConfigured, supabase } from "@/lib/supabase"
 import { useAuthStore } from "@/store/authStore"
 import { LoadingSpinner } from "@/components/LoadingSpinner"
 
 /**
- * Orden garantizado:
- * 1) exchangeCodeForSession si hay `code` en la URL (antes de montar rutas hijas).
- * 2) checkSession una vez con sesión ya persistida.
- * 3) Suscripción onAuthStateChange (sin INITIAL_SESSION para evitar carreras con el paso 2).
+ * El intercambio PKCE ocurre en main.tsx. Aquí solo hidratamos el store y
+ * escuchamos cambios de sesión (sin INITIAL_SESSION para no duplicar trabajo).
  */
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [authReady, setAuthReady] = useState(false)
   const authSubRef = useRef<{ unsubscribe: () => void } | null>(null)
 
   const runBootstrap = useCallback(async () => {
-    const checkSession = useAuthStore.getState().checkSession
-
-    if (!isSupabaseConfigured() || !supabase) {
-      await checkSession()
-      return
-    }
-
-    const exchangeResult = await exchangeOAuthCodeFromUrl()
-    if (!exchangeResult.ok) {
-      useAuthStore.setState({
-        error:
-          exchangeResult.errorMessage ?? "Error en el intercambio de sesión OAuth.",
-        loading: false,
-        isAuthenticated: false,
-      })
-      return
-    }
-
-    await checkSession()
+    await useAuthStore.getState().checkSession()
   }, [])
 
   useEffect(() => {
