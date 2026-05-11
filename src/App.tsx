@@ -60,6 +60,24 @@ function AuthRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>
 }
 
+function AlumnoRoute({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated, isDocente, isAdmin, loading } = useAuthStore()
+
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <LoadingSpinner size="lg" texto="Verificando sesión..." />
+      </div>
+    )
+  }
+  if (!isAuthenticated) return <Navigate to="/login" replace />
+  if (isDocente || isAdmin) {
+    return <Navigate to={isAdmin && !isDocente ? "/admin/docentes" : "/dashboard"} replace />
+  }
+
+  return <>{children}</>
+}
+
 function AppRoutes() {
   return (
     <Routes>
@@ -102,10 +120,38 @@ function AppRoutes() {
           }
         />
 
-        <Route path="/alumno" element={<DashboardAlumno />} />
-        <Route path="/alumno/fasttrack" element={<FastTrack />} />
-        <Route path="/alumno/evaluacion" element={<EvaluacionFormal />} />
-        <Route path="/alumno/resultado/:id" element={<Resultado />} />
+        <Route
+          path="/alumno"
+          element={
+            <AlumnoRoute>
+              <DashboardAlumno />
+            </AlumnoRoute>
+          }
+        />
+        <Route
+          path="/alumno/fasttrack"
+          element={
+            <AlumnoRoute>
+              <FastTrack />
+            </AlumnoRoute>
+          }
+        />
+        <Route
+          path="/alumno/evaluacion"
+          element={
+            <AlumnoRoute>
+              <EvaluacionFormal />
+            </AlumnoRoute>
+          }
+        />
+        <Route
+          path="/alumno/resultado/:id"
+          element={
+            <AlumnoRoute>
+              <Resultado />
+            </AlumnoRoute>
+          }
+        />
       </Route>
 
       <Route path="/eval/:token" element={<BienvenidaAlumno />} />

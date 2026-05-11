@@ -233,11 +233,27 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         const { data: isAdminRpc } = await supabase.rpc("is_admin")
         const isAdmin = Boolean(isAdminRpc)
 
-        const { data: docenteRow } = await supabase
+        const { data: docenteByEmail } = await supabase
           .from("docentes")
           .select("id")
           .ilike("email", email)
           .maybeSingle()
+
+        /**
+         * Fallback: por RLS, un docente no-admin solo ve su propia fila.
+         * Si el email guardado en BD tiene espacios/casing inesperado y la
+         * comparación por `ilike` no matchea, esta consulta igual recupera
+         * "mi fila visible" sin depender del email exacto.
+         */
+        let docenteRow = docenteByEmail
+        if (!docenteRow && !isAdmin) {
+          const { data: docenteFallback } = await supabase
+            .from("docentes")
+            .select("id")
+            .limit(1)
+            .maybeSingle()
+          docenteRow = docenteFallback
+        }
 
         const isInDocentes = Boolean(docenteRow)
 
